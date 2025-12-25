@@ -3,7 +3,7 @@
     <nav class="nav">
       <a href="/index.html">主页</a>
       <a href="/dashboard.html">仪表盘</a>
-      <a href="/elderly.html">老人档案</a>
+      <a href="/Laoren.html">老人档案</a>
       <a href="/requests.html">服务请求</a>
     </nav>
   </header>

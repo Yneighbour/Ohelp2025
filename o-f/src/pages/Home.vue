@@ -3,7 +3,7 @@
     <SiteHeader />
     <main class="container">
       <h1>欢迎使用智慧养老服务管理系统</h1>
-      <p>这是主页示例（多页面应用）</p>
+      <p>这是主页示例</p>
     </main>
     <SiteFooter />
   </div>
