@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
-
+//laogong,是老工，工作的工，老工管理(`LaogongController`)：管理工作人员信息，可能会和照料产生冲突，我猜应该不会的
 @RestController
 @RequestMapping("/api/laogong")
 @CrossOrigin(origins = "*")
