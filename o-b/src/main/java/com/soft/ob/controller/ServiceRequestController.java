@@ -51,9 +51,9 @@ public class ServiceRequestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
-    @GetMapping("/elderly/{elderlyId}")
-    public ResponseEntity<List<ServiceRequest>> getServiceRequestsByElderlyId(@PathVariable Long elderlyId) {
-        List<ServiceRequest> serviceRequests = serviceRequestService.getServiceRequestsByElderlyId(elderlyId);
+    @GetMapping("/laoren/{laorenId}")
+    public ResponseEntity<List<ServiceRequest>> getServiceRequestsByLaorenId(@PathVariable Long laorenId) {
+        List<ServiceRequest> serviceRequests = serviceRequestService.getServiceRequestsByLaorenId(laorenId);
         return new ResponseEntity<>(serviceRequests, HttpStatus.OK);
     }
     

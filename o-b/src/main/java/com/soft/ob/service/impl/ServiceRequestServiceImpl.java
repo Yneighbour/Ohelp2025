@@ -38,9 +38,10 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         serviceRequest.setDescription(serviceRequestDetails.getDescription());
         serviceRequest.setType(serviceRequestDetails.getType());
         serviceRequest.setPriority(serviceRequestDetails.getPriority());
-        serviceRequest.setElderly(serviceRequestDetails.getElderly());
+        serviceRequest.setLaoren(serviceRequestDetails.getLaoren());
         serviceRequest.setAssignedStaff(serviceRequestDetails.getAssignedStaff());
         serviceRequest.setStatus(serviceRequestDetails.getStatus());
+        serviceRequest.setRequestDate(serviceRequestDetails.getRequestDate());
         serviceRequest.setScheduledDate(serviceRequestDetails.getScheduledDate());
         serviceRequest.setCompletedDate(serviceRequestDetails.getCompletedDate());
         serviceRequest.setNotes(serviceRequestDetails.getNotes());
@@ -54,8 +55,8 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
     }
     
     @Override
-    public List<ServiceRequest> getServiceRequestsByElderlyId(Long elderlyId) {
-        return serviceRequestRepository.findByElderlyId(elderlyId);
+    public List<ServiceRequest> getServiceRequestsByLaorenId(Long laorenId) {
+        return serviceRequestRepository.findByLaorenId(laorenId);
     }
     
     @Override

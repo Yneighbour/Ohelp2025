@@ -10,7 +10,7 @@ public interface ServiceRequestService {
     ServiceRequest saveServiceRequest(ServiceRequest serviceRequest);
     ServiceRequest updateServiceRequest(Long id, ServiceRequest serviceRequest);
     void deleteServiceRequest(Long id);
-    List<ServiceRequest> getServiceRequestsByElderlyId(Long elderlyId);
+    List<ServiceRequest> getServiceRequestsByLaorenId(Long laorenId);
     List<ServiceRequest> getServiceRequestsByStatus(String status);
     List<ServiceRequest> getServiceRequestsByPriority(String priority);
 }
