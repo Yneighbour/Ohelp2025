@@ -1,6 +1,24 @@
-html,body { height:100%; margin:0; font-family: Arial, Helvetica, sans-serif; }
-.site-header { background:#0d6efd; color:#fff; padding:12px 0 }
-.nav { display:flex; gap:16px; justify-content:center }
+:root{
+	--bg:#ffffff;
+	--primary:#0d6efd;
+	--text:#222;
+	--muted:#666;
+}
+
+html,body { height:100%; margin:0; font-family: Arial, Helvetica, sans-serif; background:var(--bg); color:var(--text) }
+.site-header { background:var(--primary); color:#fff; padding:12px 0 }
+.nav { display:flex; gap:16px; justify-content:center; align-items:center }
 .nav a { color:#fff; text-decoration:none }
 .container { max-width:960px; margin:24px auto; padding:0 16px }
 .site-footer { background:#f1f1f1; padding:12px 0; text-align:center; margin-top:40px }
+
+/* Elder mode: larger font, higher contrast, simplified layout */
+.elder-mode {
+	--bg:#fffef6;
+	--primary:#ff6b6b;
+	--text:#111;
+}
+.elder-mode body, .elder-mode html { font-size:1.15rem }
+.elder-mode .site-header { padding:18px 0 }
+.elder-mode .nav a { font-size:1.2rem; padding:8px 12px }
+.elder-mode .container { padding:0 12px }
