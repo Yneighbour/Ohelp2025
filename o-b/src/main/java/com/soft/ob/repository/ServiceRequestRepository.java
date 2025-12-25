@@ -11,6 +11,5 @@ public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, 
     List<ServiceRequest> findByLaoren(Laoren laoren);
     List<ServiceRequest> findByStatus(String status);
     List<ServiceRequest> findByPriority(String priority);
-    List<ServiceRequest> findByAssignedStaff(String assignedStaff);
     List<ServiceRequest> findByLaorenId(Long laorenId);
 }
