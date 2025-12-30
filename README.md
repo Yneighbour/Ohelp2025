@@ -46,7 +46,7 @@
 - **创建照料计划** (`ZhaoliaoController`) ：(每日送餐，洗浴)
 - **服务评价** (`PingjiaController`)：老人或家属对服务的评价
 
-### 8. 护工管理模块
+### 8. 家属探望模块
 
 - 家属探望登记(TanwangController)
 

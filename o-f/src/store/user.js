@@ -1,28 +1,39 @@
 import { defineStore } from 'pinia'
+import { getUserInfo } from '../api/user'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    token: localStorage.getItem('token') || null,
-    user: null,
-    // uiMode: 'admin' | 'elder'
-    uiMode: localStorage.getItem('uiMode') || 'admin'
+    userInfo: null,
+    loading: false,
+    error: null
   }),
+  
+  getters: {
+    isAuthenticated: (state) => !!state.userInfo
+  },
+  
   actions: {
-    setToken(t) {
-      this.token = t
-      localStorage.setItem('token', t)
+    async fetchUserInfo() {
+      this.loading = true
+      this.error = null
+      try {
+        const data = await getUserInfo()
+        this.userInfo = data
+        return data
+      } catch (error) {
+        this.error = error
+        throw error
+      } finally {
+        this.loading = false
+      }
     },
-    setUIMode(mode) {
-      this.uiMode = mode
-      localStorage.setItem('uiMode', mode)
-      // apply body class for elder mode
-      if (mode === 'elder') document.body.classList.add('elder-mode')
-      else document.body.classList.remove('elder-mode')
+    
+    setUserInfo(userInfo) {
+      this.userInfo = userInfo
     },
-    clear() {
-      this.token = null
-      this.user = null
-      localStorage.removeItem('token')
+    
+    clearUserInfo() {
+      this.userInfo = null
     }
   }
 })
