@@ -17,9 +17,14 @@ export const useUserStore = defineStore('user', {
       this.loading = true
       this.error = null
       try {
-        const data = await getUserInfo()
-        this.userInfo = data
-        return data
+        const response = await getUserInfo()
+        // 使用统一的API响应结构
+        if (response.success) {
+          this.userInfo = response.data
+          return response.data
+        } else {
+          throw new Error(response.message || '获取用户信息失败')
+        }
       } catch (error) {
         this.error = error
         throw error

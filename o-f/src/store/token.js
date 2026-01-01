@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { refreshToken as refreshTokenAPI } from '../api/token'
+import { refreshToken as refreshTokenAPI } from '../api/auth'
 
 export const useTokenStore = defineStore('token', {
   state: () => ({
@@ -35,9 +35,14 @@ export const useTokenStore = defineStore('token', {
       }
       
       try {
-        const data = await refreshTokenAPI()
-        this.setToken(data.token, data.refreshToken, data.expires)
-        return data
+        const response = await refreshTokenAPI()
+        // 使用统一的API响应结构
+        if (response.success) {
+          this.setToken(response.data.token, response.data.refreshToken, response.data.expires)
+          return response.data
+        } else {
+          throw new Error(response.message || '刷新令牌失败')
+        }
       } catch (error) {
         this.clearToken()
         throw error

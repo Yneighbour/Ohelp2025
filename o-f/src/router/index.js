@@ -15,98 +15,97 @@ const routes = [
     name: 'Dashboard',
     component: () => import('../pages/Dashboard.vue')
   },
-  // 用户管理模块
+  // System management module
   {
     path: '/user',
     name: 'User',
-    component: () => import('../pages/UserList.vue')
+    component: () => import('../pages/system/UserList.vue')
   },
-  // 老人管理模块
+  // Elder management module
   {
-    path: '/laoren',
-    name: 'Laoren',
-    component: () => import('../pages/LaorenList.vue')
-  },
-  // 服务管理模块
-  {
-    path: '/fuwuleixing',
-    name: 'Fuwuleixing',
-    component: () => import('../pages/FuwuleixingList.vue')
+    path: '/elder',
+    name: 'Elder',
+    component: () => import('../pages/elder/LaorenList.vue')
   },
   {
-    path: '/fuwuxiangmu',
-    name: 'Fuwuxiangmu',
-    component: () => import('../pages/FuwuxiangmuList.vue')
+    path: '/relative',
+    name: 'Relative',
+    component: () => import('../pages/elder/QinshuList.vue')
+  },
+  // Worker management module
+  {
+    path: '/worker',
+    name: 'Worker',
+    component: () => import('../pages/worker/LaogongList.vue')
+  },
+  // Service management module
+  {
+    path: '/service-category',
+    name: 'ServiceCategory',
+    component: () => import('../pages/service/FuwuleixingList.vue')
   },
   {
-    path: '/fuwugoumai',
-    name: 'Fuwugoumai',
-    component: () => import('../pages/FuwugoumaiList.vue')
-  },
-  // 活动管理模块
-  {
-    path: '/huodongfenlei',
-    name: 'Huodongfenlei',
-    component: () => import('../pages/HuodongfenleiList.vue')
+    path: '/service-item',
+    name: 'ServiceItem',
+    component: () => import('../pages/service/FuwuxiangmuList.vue')
   },
   {
-    path: '/huodongxinxi',
-    name: 'Huodongxinxi',
-    component: () => import('../pages/HuodongxinxiList.vue')
-  },
-  // 健康与医疗模块
-  {
-    path: '/meirijiankang',
-    name: 'Meirijiankang',
-    component: () => import('../pages/MeirijiankangList.vue')
+    path: '/service-purchase',
+    name: 'ServicePurchase',
+    component: () => import('../pages/service/FuwugoumaiList.vue')
   },
   {
-    path: '/jiwangbingshi',
-    name: 'Jiwangbingshi',
-    component: () => import('../pages/JiwangbingshiList.vue')
+    path: '/service-request',
+    name: 'ServiceRequest',
+    component: () => import('../pages/service/Requests.vue')
   },
   {
-    path: '/jifenzengjia',
-    name: 'Jifenzengjia',
-    component: () => import('../pages/JifenzengjiaList.vue')
-  },
-  // 社交与紧急模块
-  {
-    path: '/qinshu',
-    name: 'Qinshu',
-    component: () => import('../pages/QinshuList.vue')
+    path: '/review',
+    name: 'Review',
+    component: () => import('../pages/service/PingjiaList.vue')
   },
   {
-    path: '/laogong',
-    name: 'Laogong',
-    component: () => import('../pages/LaogongList.vue')
+    path: '/care',
+    name: 'Care',
+    component: () => import('../pages/service/ZhaoliaoList.vue')
+  },
+  // Activity management module
+  {
+    path: '/activity-category',
+    name: 'ActivityCategory',
+    component: () => import('../pages/activity/HuodongfenleiList.vue')
   },
   {
-    path: '/jinjiqiuzhu',
-    name: 'Jinjiqiuzhu',
-    component: () => import('../pages/JinjiqiuzhuList.vue')
-  },
-  // 护工管理模块
-  {
-    path: '/zhaoliao',
-    name: 'Zhaoliao',
-    component: () => import('../pages/ZhaoliaoList.vue')
+    path: '/activity-info',
+    name: 'ActivityInfo',
+    component: () => import('../pages/activity/HuodongxinxiList.vue')
   },
   {
-    path: '/pingjia',
-    name: 'Pingjia',
-    component: () => import('../pages/PingjiaList.vue')
+    path: '/visit',
+    name: 'Visit',
+    component: () => import('../pages/activity/TanwangList.vue')
   },
-  // 家属探望模块
+  // Health management module
   {
-    path: '/tanwang',
-    name: 'Tanwang',
-    component: () => import('../pages/TanwangList.vue')
+    path: '/health-record',
+    name: 'HealthRecord',
+    component: () => import('../pages/health/MeirijiankangList.vue')
   },
   {
-    path: '/requests',
-    name: 'Requests',
-    component: () => import('../pages/Requests.vue')
+    path: '/medical-history',
+    name: 'MedicalHistory',
+    component: () => import('../pages/health/JiwangbingshiList.vue')
+  },
+  {
+    path: '/point',
+    name: 'Point',
+    component: () => import('../pages/health/JifenzengjiaList.vue')
+  },
+  // Emergency management module
+  {
+    path: '/emergency',
+    name: 'Emergency',
+    component: () => import('../pages/emergency/JinjiqiuzhuList.vue')
   }
 ]
 
