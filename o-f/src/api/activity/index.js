@@ -83,6 +83,14 @@ export const getActivityInfoByCategory = (categoryId) => {
   })
 }
 
+// Get activity by status (0=未启用, 1=启用)
+export const getActivityInfoByStatus = (huodongYesno) => {
+  return request({
+    url: `/api/huodongxinxi/status/${huodongYesno}`,
+    method: 'GET'
+  })
+}
+
 // Visit management (tanwang module)
 export const getVisitList = () => {
   return request({
@@ -125,5 +133,38 @@ export const getVisitByElder = (elderId) => {
   return request({
     url: `/api/tanwang/laoren/${elderId}`,
     method: 'GET'
+  })
+}
+
+// Visit query methods (tanfang module)
+export const getVisitByVisitor = (visitorName) => {
+  return request({
+    url: `/api/tanwang/visitor/${visitorName}`,
+    method: 'GET'
+  })
+}
+
+export const getVisitByStatus = (status) => {
+  return request({
+    url: `/api/tanwang/status/${status}`,
+    method: 'GET'
+  })
+}
+
+export const getVisitByEmployee = (employeeId) => {
+  return request({
+    url: `/api/tanwang/employee/${employeeId}`,
+    method: 'GET'
+  })
+}
+
+export const getVisitByTimeRange = (startTime, endTime) => {
+  return request({
+    url: `/api/tanwang/time-range`,
+    method: 'GET',
+    params: {
+      startTime,
+      endTime
+    }
   })
 }

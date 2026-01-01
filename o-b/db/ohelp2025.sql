@@ -209,7 +209,7 @@ CREATE TABLE medical_history (
 ) COMMENT='既往病史表';
 
 -- 积分管理表
-CREATE TABLE积分_management (
+CREATE TABLE points_management (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '积分记录ID',
     elderly_uuid VARCHAR(50) NOT NULL COMMENT '老人UUID',
     elderly_name VARCHAR(50) NOT NULL COMMENT '老人姓名',
@@ -497,6 +497,73 @@ VALUES
 ('LR000003', '王奶奶', '王小红', '13800138005', '110101197802021235', NOW()),
 ('LR000004', '张爷爷', '张小华', '13800138006', '110101198003031235', NOW());
 
+-- 插入测试活动分类数据
+INSERT INTO activity_categories (name, status, create_time) 
+VALUES 
+('文化活动', 1, NOW()),
+('健康讲座', 1, NOW()),
+('户外旅游', 1, NOW()),
+('手工制作', 1, NOW());
+
+-- 插入测试活动信息数据
+INSERT INTO activities (name, address, activity_time, fee, content, category_id, status, create_time) 
+VALUES 
+('书法培训班', '北京市朝阳区养老院多功能厅', DATE_ADD(NOW(), INTERVAL 2 DAY), 0.00, '每周二、四下午举办书法培训活动', 1, 'CONFIRMED', NOW()),
+('健康讲座 - 高血压防治', '北京市朝阳区养老院会议室', DATE_ADD(NOW(), INTERVAL 3 DAY), 0.00, '专业医生讲解高血压防治知识', 2, 'CONFIRMED', NOW()),
+('秋季公园游', '北京市朝阳公园', DATE_ADD(NOW(), INTERVAL 5 DAY), 50.00, '组织老人秋季公园游览活动', 3, 'PENDING', NOW()),
+('手工编织活动', '北京市朝阳区养老院活动室', DATE_ADD(NOW(), INTERVAL 7 DAY), 0.00, '学习编织技巧，制作手工艺品', 4, 'CONFIRMED', NOW());
+
+-- 插入测试家属探望登记数据
+INSERT INTO visit_registrations (uuid, visitor_name, visitor_phone, relationship, elderly_id, elderly_name, visit_time, status, create_time) 
+VALUES 
+('VR000001', '李小明', '13800138004', '孙子', 2, '李爷爷', DATE_ADD(NOW(), INTERVAL 1 DAY), 'CONFIRMED', NOW()),
+('VR000002', '王小红', '13800138005', '孙女', 3, '王奶奶', DATE_ADD(NOW(), INTERVAL 2 DAY), 'PENDING', NOW()),
+('VR000003', '张小华', '13800138006', '儿子', 4, '张爷爷', DATE_ADD(NOW(), INTERVAL 3 DAY), 'CONFIRMED', NOW()),
+('VR000004', '李大明', '13800138007', '儿子', 2, '李爷爷', DATE_ADD(NOW(), INTERVAL 4 DAY), 'PENDING', NOW());
+
+-- 插入测试积分管理数据
+INSERT INTO points_management (elderly_uuid, elderly_name, reason, points, description, create_time) 
+VALUES 
+('LR000002', '李爷爷', '参加活动', 50.00, '参加书法培训班获得积分', NOW()),
+('LR000003', '王奶奶', '健康打卡', 20.00, '连续7天健康打卡获得积分', NOW()),
+('LR000004', '张爷爷', '服务评价', 30.00, '对服务进行评价获得积分', NOW()),
+('LR000002', '李爷爷', '生日奖励', 100.00, '生日当天获得积分奖励', NOW());
+
+-- 插入测试紧急求助数据
+INSERT INTO emergency_requests (elderly_uuid, elderly_name, content, create_time) 
+VALUES 
+('LR000002', '李爷爷', '身体不适，需要医生检查', NOW()),
+('LR000003', '王奶奶', '摔倒了，需要帮助', DATE_SUB(NOW(), INTERVAL 2 DAY));
+
+-- 插入测试每日健康数据
+INSERT INTO daily_health (name, content, create_time) 
+VALUES 
+('健康小贴士', '老年人应保持充足的水分摄入，每天至少饮用1500ml水', NOW()),
+('营养建议', '建议多食用富含膳食纤维的食物，如蔬菜、水果和全谷物', NOW()),
+('运动指导', '适当的散步有助于保持身体健康，建议每天散步30分钟', NOW());
+
+-- 插入测试既往病史数据
+INSERT INTO medical_history (elderly_uuid, elderly_name, illness_name, description, create_time) 
+VALUES 
+('LR000002', '李爷爷', '高血压', '高血压病史10年，需长期服药', NOW()),
+('LR000003', '王奶奶', '糖尿病', '2型糖尿病，需控制饮食和运动', NOW()),
+('LR000004', '张爷爷', '关节炎', '膝关节关节炎，需定期理疗', NOW());
+
+-- 插入测试服务评价数据
+INSERT INTO service_evaluations (uuid, service_name, elderly_id, elderly_name, staff_id, staff_name, rating, comment, service_type, create_time) 
+VALUES 
+('SE000001', '日常洗浴服务', 2, '李爷爷', 1, '张护士', 5, '服务态度好，专业细致', '生活照料', NOW()),
+('SE000002', '健康监测', 3, '王奶奶', 3, '王医生', 4, '服务及时，专业可靠', '医疗护理', NOW()),
+('SE000003', '康复训练', 4, '张爷爷', 2, '李护士', 5, '耐心指导，效果明显', '康复理疗', NOW());
+
+-- 插入更多测试服务请求数据
+INSERT INTO service_requests (title, description, type, priority, elderly_id, assigned_staff_id, status, create_time) 
+VALUES 
+('理发服务', '需要定期理发服务', '生活照料', 'LOW', 2, 1, 'PENDING', NOW()),
+('心理咨询', '需要心理疏导服务', '心理关怀', 'MEDIUM', 3, 2, 'PENDING', NOW()),
+('日常护理', '需要日常起居护理', '生活照料', 'MEDIUM', 4, 1, 'COMPLETED', NOW()),
+('文化娱乐', '需要参加文化活动', '文化娱乐', 'LOW', 2, 3, 'PENDING', NOW());
+
 -- 创建存储过程用于用户登录尝试限制
 DELIMITER //
 
@@ -619,7 +686,23 @@ SELECT 'service_requests' as table_name, COUNT(*) as record_count FROM service_r
 UNION ALL
 SELECT 'care_plans' as table_name, COUNT(*) as record_count FROM care_plans
 UNION ALL
-SELECT 'relatives' as table_name, COUNT(*) as record_count FROM relatives;
+SELECT 'relatives' as table_name, COUNT(*) as record_count FROM relatives
+UNION ALL
+SELECT 'activity_categories' as table_name, COUNT(*) as record_count FROM activity_categories
+UNION ALL
+SELECT 'activities' as table_name, COUNT(*) as record_count FROM activities
+UNION ALL
+SELECT 'visit_registrations' as table_name, COUNT(*) as record_count FROM visit_registrations
+UNION ALL
+SELECT 'points_management' as table_name, COUNT(*) as record_count FROM points_management
+UNION ALL
+SELECT 'emergency_requests' as table_name, COUNT(*) as record_count FROM emergency_requests
+UNION ALL
+SELECT 'daily_health' as table_name, COUNT(*) as record_count FROM daily_health
+UNION ALL
+SELECT 'medical_history' as table_name, COUNT(*) as record_count FROM medical_history
+UNION ALL
+SELECT 'service_evaluations' as table_name, COUNT(*) as record_count FROM service_evaluations;
 
 -- 2. 检查索引是否存在
 SHOW INDEX FROM users;
@@ -630,6 +713,14 @@ SHOW INDEX FROM service_items;
 SHOW INDEX FROM service_requests;
 SHOW INDEX FROM care_plans;
 SHOW INDEX FROM relatives;
+SHOW INDEX FROM activity_categories;
+SHOW INDEX FROM activities;
+SHOW INDEX FROM visit_registrations;
+SHOW INDEX FROM points_management;
+SHOW INDEX FROM emergency_requests;
+SHOW INDEX FROM daily_health;
+SHOW INDEX FROM medical_history;
+SHOW INDEX FROM service_evaluations;
 
 -- 3. 测试外键约束
 SELECT 

@@ -180,6 +180,14 @@ export const getServiceRequestsByPriority = (priority) => {
   })
 }
 
+// Get service requests by elder ID
+export const getServiceRequestsByElder = (laorenId) => {
+  return request({
+    url: `/api/service-requests/laoren/${laorenId}`,
+    method: 'GET'
+  })
+}
+
 // Review management (pingjia module)
 export const getReviewList = () => {
   return request({

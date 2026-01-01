@@ -28,6 +28,11 @@ const routes = [
     component: () => import('../pages/elder/LaorenList.vue')
   },
   {
+    path: '/elder/:id',
+    name: 'ElderDetail',
+    component: () => import('../pages/elder/LaorenDetail.vue')
+  },
+  {
     path: '/relative',
     name: 'Relative',
     component: () => import('../pages/elder/QinshuList.vue')
