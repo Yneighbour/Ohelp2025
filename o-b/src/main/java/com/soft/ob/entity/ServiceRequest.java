@@ -25,8 +25,8 @@ public class ServiceRequest {
     private String priority; // LOW, MEDIUM, HIGH, URGENT
     
     @ManyToOne
-    @JoinColumn(name = "laoren_id")
-    private Laoren laoren;
+    @JoinColumn(name = "elderly_id")
+    private Elderly elderly;
     
     @Column
     private String assignedStaff;

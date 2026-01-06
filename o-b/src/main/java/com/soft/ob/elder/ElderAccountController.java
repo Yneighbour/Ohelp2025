@@ -1,7 +1,7 @@
 package com.soft.ob.elder;
 
-import com.soft.ob.entity.Laoren;
-import com.soft.ob.elder.service.LaorenService;
+import com.soft.ob.entity.Elderly;
+import com.soft.ob.elder.service.ElderlyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,46 +15,46 @@ import java.util.Optional;
 public class ElderAccountController {
     
     @Autowired
-    private LaorenService laorenService;
+    private ElderlyService elderlyService;
     
     @GetMapping
-    public ResponseEntity<List<Laoren>> getAllLaoren() {
-        List<Laoren> laorenList = laorenService.getAllLaoren();
-        return new ResponseEntity<>(laorenList, HttpStatus.OK);
+    public ResponseEntity<List<Elderly>> getAllLaoren() {
+        List<Elderly> elderlyList = elderlyService.getAllElderly();
+        return new ResponseEntity<>(elderlyList, HttpStatus.OK);
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Laoren> getLaorenById(@PathVariable Long id) {
-        Optional<Laoren> laoren = laorenService.getLaorenById(id);
-        return laoren.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+    public ResponseEntity<Elderly> getLaorenById(@PathVariable Long id) {
+        Optional<Elderly> elderly = elderlyService.getElderlyById(id);
+        return elderly.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
             .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
     
     @PostMapping("/register")
-    public ResponseEntity<Laoren> registerLaoren(@RequestBody Laoren laoren) {
+    public ResponseEntity<Elderly> registerLaoren(@RequestBody Elderly elderly) {
         try {
-            Laoren registeredLaoren = laorenService.registerLaoren(laoren);
-            return new ResponseEntity<>(registeredLaoren, HttpStatus.CREATED);
+            Elderly registeredElderly = elderlyService.registerElderly(elderly);
+            return new ResponseEntity<>(registeredElderly, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
     
     @PostMapping("/login")
-    public ResponseEntity<Laoren> loginLaoren(@RequestBody Laoren loginRequest) {
+    public ResponseEntity<Elderly> loginLaoren(@RequestBody Elderly loginRequest) {
         try {
-            Laoren laoren = laorenService.loginLaoren(loginRequest.getUsername(), loginRequest.getPassword());
-            return new ResponseEntity<>(laoren, HttpStatus.OK);
+            Elderly elderly = elderlyService.loginElderly(loginRequest.getUsername(), loginRequest.getPassword());
+            return new ResponseEntity<>(elderly, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Laoren> updateLaoren(@PathVariable Long id, @RequestBody Laoren laoren) {
+    public ResponseEntity<Elderly> updateLaoren(@PathVariable Long id, @RequestBody Elderly elderly) {
         try {
-            Laoren updatedLaoren = laorenService.updateLaoren(id, laoren);
-            return new ResponseEntity<>(updatedLaoren, HttpStatus.OK);
+            Elderly updatedElderly = elderlyService.updateElderly(id, elderly);
+            return new ResponseEntity<>(updatedElderly, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -63,7 +63,7 @@ public class ElderAccountController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLaoren(@PathVariable Long id) {
         try {
-            laorenService.deleteLaoren(id);
+            elderlyService.deleteElderly(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -73,7 +73,7 @@ public class ElderAccountController {
     @PutMapping("/{id}/password")
     public ResponseEntity<Boolean> changeLaorenPassword(@PathVariable Long id, @RequestBody LaorenPasswordChangeRequest request) {
         try {
-            boolean result = laorenService.changeLaorenPassword(id, request.getOldPassword(), request.getNewPassword());
+            boolean result = elderlyService.changeElderlyPassword(id, request.getOldPassword(), request.getNewPassword());
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
@@ -81,10 +81,10 @@ public class ElderAccountController {
     }
     
     @PutMapping("/{id}/profile")
-    public ResponseEntity<Laoren> updateLaorenProfile(@PathVariable Long id, @RequestBody Laoren laoren) {
+    public ResponseEntity<Elderly> updateLaorenProfile(@PathVariable Long id, @RequestBody Elderly elderly) {
         try {
-            Laoren updatedLaoren = laorenService.updateLaorenInfo(id, laoren);
-            return new ResponseEntity<>(updatedLaoren, HttpStatus.OK);
+            Elderly updatedElderly = elderlyService.updateElderlyInfo(id, elderly);
+            return new ResponseEntity<>(updatedElderly, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

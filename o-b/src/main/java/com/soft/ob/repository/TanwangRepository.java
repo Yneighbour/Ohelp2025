@@ -8,8 +8,8 @@ import java.util.List;
 @Repository
 public interface TanwangRepository extends JpaRepository<Tanwang, Long> {
     List<Tanwang> findByLaorenId(Long laorenId);
-    List<Tanwang> findByVisitorName(String visitorName);
+    List<Tanwang> findByVisitorNameContaining(String visitorName);
     List<Tanwang> findByStatus(String status);
-    List<Tanwang> findByStaffId(String staffId);
+    List<Tanwang> findByStaffId(Long staffId);
     List<Tanwang> findByVisitTimeBetween(java.time.LocalDateTime startTime, java.time.LocalDateTime endTime);
 }
