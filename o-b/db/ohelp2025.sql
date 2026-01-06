@@ -413,24 +413,34 @@ CREATE TABLE audit_logs (
 SET GLOBAL validate_password.policy = MEDIUM;
 SET GLOBAL validate_password.length = 8;
 
--- 插入默认管理员用户 (使用更安全的密码哈希)
+-- 插入默认管理员用户 (密码为admin，使用BCrypt加密)
 INSERT INTO users (username, password, salt, real_name, role, create_time) 
-VALUES ('admin', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+VALUES ('admin', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
         SUBSTRING(MD5(RAND()), 1, 32), '系统管理员', 'ADMIN', NOW());
 
--- 插入默认老人 (使用更安全的密码哈希)
+-- 插入普通用户 (密码为admin)
+INSERT INTO users (username, password, salt, real_name, role, create_time) 
+VALUES ('user1', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
+        SUBSTRING(MD5(RAND()), 1, 32), '普通用户', 'USER', NOW());
+
+-- 插入家属用户 (密码为admin)
+INSERT INTO users (username, password, salt, real_name, role, create_time) 
+VALUES ('relative1', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
+        SUBSTRING(MD5(RAND()), 1, 32), '家属用户', 'RELATIVE', NOW());
+
+-- 插入默认老人 (密码为admin)
 INSERT INTO elderly (uuid, username, password, salt, name, create_time) 
-VALUES ('LR000001', 'laoren', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+VALUES ('LR000001', 'laoren', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
         SUBSTRING(MD5(RAND()), 1, 32), '默认老人', NOW());
 
--- 插入测试工作人员数据
+-- 插入测试工作人员数据 (密码均为admin)
 INSERT INTO staff (uuid, username, password, salt, name, phone, id_number, create_time) 
 VALUES 
-('ST000001', 'nurse1', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+('ST000001', 'nurse1', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
  SUBSTRING(MD5(RAND()), 1, 32), '张护士', '13800138001', '110101198001011234', NOW()),
-('ST000002', 'nurse2', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+('ST000002', 'nurse2', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
  SUBSTRING(MD5(RAND()), 1, 32), '李护士', '13800138002', '110101198002021234', NOW()),
-('ST000003', 'doctor1', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+('ST000003', 'doctor1', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
  SUBSTRING(MD5(RAND()), 1, 32), '王医生', '13800138003', '110101197501011234', NOW());
 
 -- 插入测试服务类型数据
@@ -466,14 +476,14 @@ FROM (
            (SELECT id FROM service_types WHERE name = '文化娱乐') as id, 1 as status, NOW() as create_time
 ) AS service_items_data;
 
--- 插入测试老人数据
+-- 插入测试老人数据 (密码均为admin)
 INSERT INTO elderly (uuid, username, password, salt, name, age, gender, phone, id_number, address, create_time) 
 VALUES 
-('LR000002', 'laoren2', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+('LR000002', 'laoren2', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
  SUBSTRING(MD5(RAND()), 1, 32), '李爷爷', 78, 'MALE', '13900139001', '110101194501011234', '北京市朝阳区养老院1号楼101室', NOW()),
-('LR000003', 'laoren3', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+('LR000003', 'laoren3', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
  SUBSTRING(MD5(RAND()), 1, 32), '王奶奶', 75, 'FEMALE', '13900139002', '110101194802021234', '北京市朝阳区养老院1号楼102室', NOW()),
-('LR000004', 'laoren4', '$2a$10$vaQV8ezZxkZQSx4N8z4Mz.T44vV8z4Mz.T44vV8z4Mz.T44vV8z4Mz', 
+('LR000004', 'laoren4', '$2a$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 
  SUBSTRING(MD5(RAND()), 1, 32), '张爷爷', 82, 'MALE', '13900139003', '110101194103031234', '北京市朝阳区养老院1号楼103室', NOW());
 
 -- 插入测试服务请求数据
