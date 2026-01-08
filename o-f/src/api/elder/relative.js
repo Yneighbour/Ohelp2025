@@ -1,46 +1,67 @@
 import request from '../../utils/request'
 
-// Elderly relatives management (qinshu module)
-export const getRelativeList = () => {
-  return request({
-    url: '/api/qinshu',
-    method: 'GET'
-  })
-}
-
+// Create relative
 export const createRelative = (data) => {
   return request({
-    url: '/api/qinshu',
+    url: '/api/elder/relative/',
     method: 'POST',
     data
   })
 }
 
+// Get relative by id
+export const getRelativeById = (id) => {
+  return request({
+    url: `/api/elder/relative/${id}`,
+    method: 'GET'
+  })
+}
+
+// Get relatives by elderly id
+export const getRelativeByElderly = (elderlyId) => {
+  return request({
+    url: `/api/elder/relative/elderly/${elderlyId}`,
+    method: 'GET'
+  })
+}
+
+// Get all relatives
+export const getRelativeList = () => {
+  return request({
+    url: '/api/elder/relative/',
+    method: 'GET'
+  })
+}
+
+// Update relative
 export const updateRelative = (id, data) => {
   return request({
-    url: `/api/qinshu/${id}`,
+    url: `/api/elder/relative/${id}`,
     method: 'PUT',
     data
   })
 }
 
+// Delete relative
 export const deleteRelative = (id) => {
   return request({
-    url: `/api/qinshu/${id}`,
+    url: `/api/elder/relative/${id}`,
     method: 'DELETE'
   })
 }
 
-export const getRelativeById = (id) => {
+// Activate relative
+export const activateRelative = (id) => {
   return request({
-    url: `/api/qinshu/${id}`,
-    method: 'GET'
+    url: `/api/elder/relative/${id}/activate`,
+    method: 'PUT'
   })
 }
 
-export const getRelativeByElder = (elderId) => {
+// Deactivate relative
+export const deactivateRelative = (id) => {
   return request({
-    url: `/api/qinshu/laoren/${elderId}`,
-    method: 'GET'
+    url: `/api/elder/relative/${id}/deactivate`,
+    method: 'PUT'
   })
 }

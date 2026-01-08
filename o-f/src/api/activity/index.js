@@ -1,170 +1,75 @@
 import request from '../../utils/request'
 
-// Activity category management (huodongfenlei module)
-export const getActivityCategoryList = () => {
+// Create activity
+export const createActivity = (data) => {
   return request({
-    url: '/api/huodongfenlei',
-    method: 'GET'
-  })
-}
-
-export const createActivityCategory = (data) => {
-  return request({
-    url: '/api/huodongfenlei',
+    url: '/api/activity/',
     method: 'POST',
     data
   })
 }
 
-export const updateActivityCategory = (id, data) => {
+// Get activity by id
+export const getActivityById = (id) => {
   return request({
-    url: `/api/huodongfenlei/${id}`,
+    url: `/api/activity/${id}`,
+    method: 'GET'
+  })
+}
+
+// Get all activities
+export const getActivityList = () => {
+  return request({
+    url: '/api/activity/',
+    method: 'GET'
+  })
+}
+
+// Get activities by category
+export const getActivityByCategory = (category) => {
+  return request({
+    url: `/api/activity/category/${category}`,
+    method: 'GET'
+  })
+}
+
+// Get activities by status
+export const getActivityByStatus = (status) => {
+  return request({
+    url: `/api/activity/status/${status}`,
+    method: 'GET'
+  })
+}
+
+// Update activity
+export const updateActivity = (id, data) => {
+  return request({
+    url: `/api/activity/${id}`,
     method: 'PUT',
     data
   })
 }
 
-export const deleteActivityCategory = (id) => {
+// Delete activity
+export const deleteActivity = (id) => {
   return request({
-    url: `/api/huodongfenlei/${id}`,
+    url: `/api/activity/${id}`,
     method: 'DELETE'
   })
 }
 
-export const getActivityCategoryById = (id) => {
+// Activate activity
+export const activateActivity = (id) => {
   return request({
-    url: `/api/huodongfenlei/${id}`,
-    method: 'GET'
+    url: `/api/activity/${id}/activate`,
+    method: 'PUT'
   })
 }
 
-// Activity information management (huodongxinxi module)
-export const getActivityInfoList = () => {
+// Deactivate activity
+export const deactivateActivity = (id) => {
   return request({
-    url: '/api/huodongxinxi',
-    method: 'GET'
-  })
-}
-
-export const createActivityInfo = (data) => {
-  return request({
-    url: '/api/huodongxinxi',
-    method: 'POST',
-    data
-  })
-}
-
-export const updateActivityInfo = (id, data) => {
-  return request({
-    url: `/api/huodongxinxi/${id}`,
-    method: 'PUT',
-    data
-  })
-}
-
-export const deleteActivityInfo = (id) => {
-  return request({
-    url: `/api/huodongxinxi/${id}`,
-    method: 'DELETE'
-  })
-}
-
-export const getActivityInfoById = (id) => {
-  return request({
-    url: `/api/huodongxinxi/${id}`,
-    method: 'GET'
-  })
-}
-
-export const getActivityInfoByCategory = (categoryId) => {
-  return request({
-    url: `/api/huodongxinxi/category/${categoryId}`,
-    method: 'GET'
-  })
-}
-
-// Get activity by status (0=未启用, 1=启用)
-export const getActivityInfoByStatus = (huodongYesno) => {
-  return request({
-    url: `/api/huodongxinxi/status/${huodongYesno}`,
-    method: 'GET'
-  })
-}
-
-// Visit management (tanwang module)
-export const getVisitList = () => {
-  return request({
-    url: '/api/tanwang',
-    method: 'GET'
-  })
-}
-
-export const createVisit = (data) => {
-  return request({
-    url: '/api/tanwang',
-    method: 'POST',
-    data
-  })
-}
-
-export const updateVisit = (id, data) => {
-  return request({
-    url: `/api/tanwang/${id}`,
-    method: 'PUT',
-    data
-  })
-}
-
-export const deleteVisit = (id) => {
-  return request({
-    url: `/api/tanwang/${id}`,
-    method: 'DELETE'
-  })
-}
-
-export const getVisitById = (id) => {
-  return request({
-    url: `/api/tanwang/${id}`,
-    method: 'GET'
-  })
-}
-
-export const getVisitByElder = (elderId) => {
-  return request({
-    url: `/api/tanwang/laoren/${elderId}`,
-    method: 'GET'
-  })
-}
-
-// Visit query methods (tanfang module)
-export const getVisitByVisitor = (visitorName) => {
-  return request({
-    url: `/api/tanwang/visitor/${visitorName}`,
-    method: 'GET'
-  })
-}
-
-export const getVisitByStatus = (status) => {
-  return request({
-    url: `/api/tanwang/status/${status}`,
-    method: 'GET'
-  })
-}
-
-export const getVisitByEmployee = (employeeId) => {
-  return request({
-    url: `/api/tanwang/employee/${employeeId}`,
-    method: 'GET'
-  })
-}
-
-export const getVisitByTimeRange = (startTime, endTime) => {
-  return request({
-    url: `/api/tanwang/time-range`,
-    method: 'GET',
-    params: {
-      startTime,
-      endTime
-    }
+    url: `/api/activity/${id}/deactivate`,
+    method: 'PUT'
   })
 }

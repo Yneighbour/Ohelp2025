@@ -1,36 +1,15 @@
 import request from '../../utils/request'
 
-// User management (user module)
-export const userLogin = (data) => {
+// Create user
+export const createUser = (data) => {
   return request({
-    url: '/api/user/login',
+    url: '/api/user/',
     method: 'POST',
     data
   })
 }
 
-export const userRegister = (data) => {
-  return request({
-    url: '/api/user/register',
-    method: 'POST',
-    data
-  })
-}
-
-export const userLogout = () => {
-  return request({
-    url: '/api/user/logout',
-    method: 'POST'
-  })
-}
-
-export const getUserInfo = () => {
-  return request({
-    url: '/api/user',
-    method: 'GET'
-  })
-}
-
+// Get user by id
 export const getUserById = (id) => {
   return request({
     url: `/api/user/${id}`,
@@ -38,6 +17,31 @@ export const getUserById = (id) => {
   })
 }
 
+// Get user by email
+export const getUserByEmail = (email) => {
+  return request({
+    url: `/api/user/email/${email}`,
+    method: 'GET'
+  })
+}
+
+// Get user by phone
+export const getUserByPhone = (phone) => {
+  return request({
+    url: `/api/user/phone/${phone}`,
+    method: 'GET'
+  })
+}
+
+// Get all users
+export const getUserList = () => {
+  return request({
+    url: '/api/user/',
+    method: 'GET'
+  })
+}
+
+// Update user
 export const updateUser = (id, data) => {
   return request({
     url: `/api/user/${id}`,
@@ -46,6 +50,7 @@ export const updateUser = (id, data) => {
   })
 }
 
+// Delete user
 export const deleteUser = (id) => {
   return request({
     url: `/api/user/${id}`,
@@ -53,18 +58,18 @@ export const deleteUser = (id) => {
   })
 }
 
-export const updatePassword = (id, data) => {
+// Activate user
+export const activateUser = (id) => {
   return request({
-    url: `/api/user/${id}/password`,
-    method: 'PUT',
-    data
+    url: `/api/user/${id}/activate`,
+    method: 'PUT'
   })
 }
 
-export const updateProfile = (id, data) => {
+// Deactivate user
+export const deactivateUser = (id) => {
   return request({
-    url: `/api/user/${id}/profile`,
-    method: 'PUT',
-    data
+    url: `/api/user/${id}/deactivate`,
+    method: 'PUT'
   })
 }
