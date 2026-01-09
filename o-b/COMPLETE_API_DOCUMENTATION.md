@@ -716,7 +716,7 @@ DELETE /api/file/{id}
 # MySQL 数据库配置
 spring.datasource.url=jdbc:mysql://localhost:3306/ohelp?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=123456
+spring.datasource.password=root
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # JPA 配置

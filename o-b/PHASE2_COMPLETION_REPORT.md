@@ -281,7 +281,7 @@ console.log(elders.data)
 
 1. **数据库连接**
    - 默认用户名: `root`
-   - 默认密码: `123456`
+   - 默认密码: `root`
    - 请根据实际环境修改 `application.properties`
 
 2. **JWT Token**
