@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "Figma": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "figma-developer-mcp",
+        "--stdio"
+      ],
+      "env": {
+        "FIGMA_API_KEY": "bLA7dQjjXcaisoRgklhh3t"
+      }
+    },
+  
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "env": {}
+    },
+    "GitHub": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      },
+      "disabled": true
+    }
+  }
+}
