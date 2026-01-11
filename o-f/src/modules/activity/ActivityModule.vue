@@ -4,7 +4,7 @@
       <h2>活动管理模块</h2>
 
       <!-- 创建活动表单 -->
-      <div class="card">
+      <div v-if="!isWorker" class="card">
         <h3>创建活动</h3>
         <form @submit.prevent="handleCreateActivity" class="form">
           <div class="form-row">
@@ -112,7 +112,7 @@
       </div>
 
       <!-- 活动查询 -->
-      <div class="card">
+      <div v-if="!isWorker" class="card">
         <h3>活动查询</h3>
         <div class="query-section">
           <div class="form-group">
@@ -208,9 +208,9 @@
             </tbody>
           </table>
           <div class="actions">
-            <button @click="handleActivateActivity(queryResult.id)" class="btn btn-success btn-sm" :disabled="!queryResult.isActive">激活</button>
-            <button @click="handleDeactivateActivity(queryResult.id)" class="btn btn-warning btn-sm" :disabled="queryResult.isActive">停用</button>
-            <button @click="handleDeleteActivity(queryResult.id)" class="btn btn-danger btn-sm">删除</button>
+            <button v-if="!isWorker" @click="handleActivateActivity(queryResult.id)" class="btn btn-success btn-sm" :disabled="!queryResult.isActive">激活</button>
+            <button v-if="!isWorker" @click="handleDeactivateActivity(queryResult.id)" class="btn btn-warning btn-sm" :disabled="queryResult.isActive">停用</button>
+            <button v-if="!isWorker" @click="handleDeleteActivity(queryResult.id)" class="btn btn-danger btn-sm">删除</button>
           </div>
         </div>
         <p v-if="queryError" class="error">{{ queryError }}</p>
@@ -220,7 +220,7 @@
       <div class="card">
         <h3>所有活动</h3>
         <button @click="loadAllActivities" class="btn btn-primary" :disabled="activityListState.loading">
-          {{ activityListState.loading ? '加载中...' : '加载所有活动' }}
+          {{ activityListState.loading ? '加载中...' : (isWorker ? '加载可参与活动' : '加载所有活动') }}
         </button>
         <div v-if="activityListState.error" class="error">{{ activityListState.error }}</div>
         <div v-if="activityListState.data.length > 0" class="table-container">
@@ -235,7 +235,7 @@
                 <th>参与人数</th>
                 <th>状态</th>
                 <th>激活状态</th>
-                <th>操作</th>
+                <th v-if="!isWorker">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -252,7 +252,7 @@
                     {{ activity.isActive ? '激活' : '未激活' }}
                   </span>
                 </td>
-                <td>
+                <td v-if="!isWorker">
                   <button @click="handleActivateActivity(activity.id)" class="btn btn-success btn-sm" :disabled="!activity.isActive">激活</button>
                   <button @click="handleDeactivateActivity(activity.id)" class="btn btn-warning btn-sm" :disabled="activity.isActive">停用</button>
                   <button @click="handleDeleteActivity(activity.id)" class="btn btn-danger btn-sm">删除</button>
@@ -313,6 +313,14 @@ export default {
         data: [],
         error: null
       }
+    }
+  },
+  computed: {
+    currentRole() {
+      return localStorage.getItem('role') || ''
+    },
+    isWorker() {
+      return this.currentRole === 'WORKER'
     }
   },
   methods: {
@@ -411,7 +419,31 @@ export default {
 
       try {
         const response = await getAllActivities()
-        this.activityListState.data = response.data
+        const all = Array.isArray(response.data) ? response.data : []
+        if (!this.isWorker) {
+          this.activityListState.data = all
+          return
+        }
+
+        const now = Date.now()
+        const filtered = all.filter((a) => {
+          if (!a) return false
+          if (!a.isActive) return false
+          if (a.status === 'cancelled') return false
+          if (!a.endTime) return true
+          const end = Date.parse(a.endTime)
+          return Number.isFinite(end) ? end >= now : true
+        })
+
+        filtered.sort((a, b) => {
+          const at = Date.parse(a.startTime)
+          const bt = Date.parse(b.startTime)
+          const av = Number.isFinite(at) ? at : 0
+          const bv = Number.isFinite(bt) ? bt : 0
+          return av - bv
+        })
+
+        this.activityListState.data = filtered
       } catch (error) {
         this.activityListState.error = error.message || '加载失败'
       } finally {

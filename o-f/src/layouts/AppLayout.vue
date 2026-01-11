@@ -2,7 +2,7 @@
   <div class="app-shell">
     <header class="app-header">
       <div class="title">Ohelp2025 智慧养老服务</div>
-      <div class="subtitle">贴心服务 · 便捷入口</div>
+      <div class="subtitle">个人使用视角 · 我的服务与健康</div>
     </header>
 
     <main class="app-main">

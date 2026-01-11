@@ -3,7 +3,7 @@
     <h3>老人信息管理</h3>
 
     <!-- 创建老人表单 -->
-    <div class="card">
+    <div v-if="!isWorker" class="card">
       <h4>添加老人信息</h4>
       <form @submit.prevent="handleCreateElderly" class="form">
         <div class="form-row">
@@ -207,9 +207,9 @@
           </tbody>
         </table>
         <div class="actions">
-          <button @click="handleActivateElderly(queryResult.id)" class="btn btn-success btn-sm" :disabled="!queryResult.isActive">激活</button>
-          <button @click="handleDeactivateElderly(queryResult.id)" class="btn btn-warning btn-sm" :disabled="queryResult.isActive">停用</button>
-          <button @click="handleDeleteElderly(queryResult.id)" class="btn btn-danger btn-sm">删除</button>
+          <button v-if="!isWorker" @click="handleActivateElderly(queryResult.id)" class="btn btn-success btn-sm" :disabled="!queryResult.isActive">激活</button>
+          <button v-if="!isWorker" @click="handleDeactivateElderly(queryResult.id)" class="btn btn-warning btn-sm" :disabled="queryResult.isActive">停用</button>
+          <button v-if="!isWorker" @click="handleDeleteElderly(queryResult.id)" class="btn btn-danger btn-sm">删除</button>
         </div>
       </div>
       <p v-if="queryError" class="error">{{ queryError }}</p>
@@ -219,7 +219,7 @@
     <div class="card">
       <h4>所有老人</h4>
       <button @click="loadAllElderly" class="btn btn-primary" :disabled="elderlyListState.loading">
-        {{ elderlyListState.loading ? '加载中...' : '加载所有老人' }}
+        {{ elderlyListState.loading ? '加载中...' : (isWorker ? '加载在档老人' : '加载所有老人') }}
       </button>
       <div v-if="elderlyListState.error" class="error">{{ elderlyListState.error }}</div>
       <div v-if="elderlyListState.data.length > 0" class="table-container">
@@ -234,7 +234,7 @@
               <th>健康状态</th>
               <th>联系人</th>
               <th>状态</th>
-              <th>操作</th>
+              <th v-if="!isWorker">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -251,7 +251,7 @@
                   {{ elderly.isActive ? '激活' : '未激活' }}
                 </span>
               </td>
-              <td>
+              <td v-if="!isWorker">
                 <button @click="handleActivateElderly(elderly.id)" class="btn btn-success btn-sm" :disabled="!elderly.isActive">激活</button>
                 <button @click="handleDeactivateElderly(elderly.id)" class="btn btn-warning btn-sm" :disabled="elderly.isActive">停用</button>
                 <button @click="handleDeleteElderly(elderly.id)" class="btn btn-danger btn-sm">删除</button>
@@ -310,6 +310,14 @@ export default {
         data: [],
         error: null
       }
+    }
+  },
+  computed: {
+    currentRole() {
+      return localStorage.getItem('role') || ''
+    },
+    isWorker() {
+      return this.currentRole === 'WORKER'
     }
   },
   methods: {
@@ -392,7 +400,8 @@ export default {
 
       try {
         const response = await getAllElderly()
-        this.elderlyListState.data = response.data
+        const all = Array.isArray(response.data) ? response.data : []
+        this.elderlyListState.data = this.isWorker ? all.filter(e => e && e.isActive) : all
       } catch (error) {
         this.elderlyListState.error = error.message || '加载失败'
       } finally {

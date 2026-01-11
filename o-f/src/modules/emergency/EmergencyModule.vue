@@ -2,9 +2,10 @@
   <div class="emergency-module">
     <div class="card">
       <h2>紧急求助模块</h2>
+      <p class="hint">{{ roleSubtitle }}</p>
 
       <!-- 创建求助请求表单 -->
-      <div class="card">
+      <div v-if="!isWorker" class="card">
         <h3>创建求助请求</h3>
         <form @submit.prevent="handleCreateEmergency" class="form">
           <div class="form-row">
@@ -79,7 +80,7 @@
       </div>
 
       <!-- 求助查询 -->
-      <div class="card">
+      <div v-if="!isWorker" class="card">
         <h3>求助查询</h3>
         <div class="query-section">
           <div class="form-group">
@@ -193,7 +194,7 @@
             >
               解决求助
             </button>
-            <button @click="handleDeleteEmergency(queryResult.id)" class="btn btn-danger btn-sm">删除</button>
+            <button v-if="!isWorker" @click="handleDeleteEmergency(queryResult.id)" class="btn btn-danger btn-sm">删除</button>
           </div>
         </div>
         <p v-if="queryError" class="error">{{ queryError }}</p>
@@ -203,9 +204,15 @@
       <div class="card">
         <h3>所有求助请求</h3>
         <button @click="loadAllEmergencies" class="btn btn-primary" :disabled="emergencyListState.loading">
-          {{ emergencyListState.loading ? '加载中...' : '加载所有求助' }}
+          {{ emergencyListState.loading ? '加载中...' : (isWorker ? '加载待处理 / 我的任务' : '加载所有求助') }}
         </button>
         <div v-if="emergencyListState.error" class="error">{{ emergencyListState.error }}</div>
+        <div
+          v-if="!emergencyListState.loading && !emergencyListState.error && emergencyListState.data.length === 0"
+          class="empty"
+        >
+          {{ listEmptyHint }}
+        </div>
         <div v-if="emergencyListState.data.length > 0" class="table-container">
           <table class="table">
             <thead>
@@ -252,7 +259,7 @@
                   >
                     解决
                   </button>
-                  <button @click="handleDeleteEmergency(emergency.id)" class="btn btn-danger btn-sm">删除</button>
+                  <button v-if="!isWorker" @click="handleDeleteEmergency(emergency.id)" class="btn btn-danger btn-sm">删除</button>
                 </td>
               </tr>
             </tbody>
@@ -276,6 +283,18 @@ import {
   respondToEmergency,
   resolveEmergency
 } from './emergency.api.js'
+
+// WORKER 视角规则（显性化，不改变现有行为）：
+// 1) 列表默认展示：所有 pending；若已登录且有 userId，则额外展示 responderId==userId 且未 resolved 的记录。
+// 2) 响应操作：WORKER 默认使用自身 userId 作为 responderId。
+
+const EMERGENCY_VIEW_RULES = Object.freeze({
+  worker: {
+    includeAllPending: true,
+    includeMyUnresolvedWhenLoggedIn: true,
+    unresolvedStatus: 'resolved'
+  }
+})
 
 export default {
   name: 'EmergencyModule',
@@ -309,6 +328,32 @@ export default {
         data: [],
         error: null
       }
+    }
+  },
+  computed: {
+    currentRole() {
+      return localStorage.getItem('role') || ''
+    },
+    currentUserId() {
+      const raw = localStorage.getItem('userId')
+      const parsed = raw ? parseInt(raw, 10) : NaN
+      return Number.isFinite(parsed) ? parsed : null
+    },
+    isAdmin() {
+      return this.currentRole === 'ADMIN'
+    },
+    isWorker() {
+      return this.currentRole === 'WORKER'
+    },
+    roleSubtitle() {
+      if (this.isWorker) return '任务执行视角 · 求助处理（前端视角过滤，不做权限控制）'
+      if (this.isAdmin) return '系统管理视角 · 全局求助概览（不做权限控制）'
+      return '个人使用视角 · 发起求助与查看进度'
+    },
+    listEmptyHint() {
+      if (this.isWorker) return '暂无可执行求助任务，可稍后刷新或前往【处理记录】查看历史处理'
+      if (this.isAdmin) return '暂无求助数据，可稍后刷新或引导用户发起求助'
+      return '暂无求助记录，可在上方创建求助请求'
     }
   },
   methods: {
@@ -425,7 +470,34 @@ export default {
 
       try {
         const response = await getAllEmergencies()
-        this.emergencyListState.data = response.data
+        const all = Array.isArray(response.data) ? response.data : []
+
+        if (!this.isWorker) {
+          this.emergencyListState.data = all
+          return
+        }
+
+        const userId = this.currentUserId
+        const filtered = all.filter((e) => {
+          if (!e) return false
+          if (EMERGENCY_VIEW_RULES.worker.includeAllPending && e.status === 'pending') return true
+          if (!userId) return false
+          if (!EMERGENCY_VIEW_RULES.worker.includeMyUnresolvedWhenLoggedIn) return false
+          return e.responderId === userId && e.status !== EMERGENCY_VIEW_RULES.worker.unresolvedStatus
+        })
+
+        const priorityRank = { high: 0, medium: 1, low: 2 }
+        const statusRank = { pending: 0, responded: 1, resolved: 2 }
+
+        filtered.sort((a, b) => {
+          const sr = (statusRank[a.status] ?? 9) - (statusRank[b.status] ?? 9)
+          if (sr !== 0) return sr
+          const pr = (priorityRank[a.priority] ?? 9) - (priorityRank[b.priority] ?? 9)
+          if (pr !== 0) return pr
+          return (b.id ?? 0) - (a.id ?? 0)
+        })
+
+        this.emergencyListState.data = filtered
       } catch (error) {
         this.emergencyListState.error = error.message || '加载失败'
       } finally {
@@ -435,16 +507,17 @@ export default {
 
     async handleRespondToEmergency(id) {
       try {
-        // 这里可以添加响应人ID的输入逻辑
-        const responderId = prompt('请输入响应人ID:')
-        if (!responderId) return
+        const responderId = (this.isWorker && this.currentUserId)
+          ? this.currentUserId
+          : parseInt(prompt('请输入响应人ID:'), 10)
+        if (!Number.isFinite(responderId)) return
 
-        await respondToEmergency(id, { responderId: parseInt(responderId) })
+        await respondToEmergency(id, { responderId })
         alert('响应成功！')
         await this.loadAllEmergencies()
         if (this.queryResult && this.queryResult.id === id) {
           this.queryResult.status = 'responded'
-          this.queryResult.responderId = parseInt(responderId)
+          this.queryResult.responderId = responderId
         }
       } catch (error) {
         alert('响应失败: ' + (error.message || '未知错误'))
@@ -505,6 +578,16 @@ export default {
 <style scoped>
 .emergency-module {
   padding: 1rem 0;
+}
+
+.hint {
+  margin-top: 6px;
+  color: #64748b;
+}
+
+.empty {
+  margin-top: 10px;
+  color: #64748b;
 }
 
 .form-row {

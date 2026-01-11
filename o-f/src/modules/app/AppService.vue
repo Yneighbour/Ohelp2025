@@ -1,7 +1,7 @@
 <template>
   <div class="page">
-    <h2 class="title">服务</h2>
-    <p class="hint">这里展示我的服务订单摘要与评价入口（占位页面，不调用真实 API）。</p>
+    <h2 class="title">{{ pageTitle }}</h2>
+    <p class="hint">{{ subtitle }}</p>
 
     <div class="card">
       <div class="item">
@@ -17,8 +17,116 @@
 </template>
 
 <script>
+import { getUser } from '../user/user.api.js'
+import { getAllElderly } from '../elder/elderly/elderly.api.js'
+import { getAllRelatives } from '../elder/relative/relative.api.js'
+
 export default {
-  name: 'AppService'
+  name: 'AppService',
+  data() {
+    return {
+      userView: 'generic',
+      currentUser: null,
+      boundRelative: null,
+      focusedElderly: null,
+      state: {
+        loading: false,
+        error: null
+      }
+    }
+  },
+  computed: {
+    currentUserId() {
+      const raw = localStorage.getItem('userId')
+      const parsed = raw ? parseInt(raw, 10) : NaN
+      return Number.isFinite(parsed) ? parsed : null
+    },
+    pageTitle() {
+      if (this.userView === 'elderly') return '我的服务'
+      if (this.userView === 'family') return '代办服务'
+      return '服务'
+    },
+    subtitle() {
+      if (this.userView === 'elderly') return '老人视角 · 这里展示我的服务订单摘要与评价入口（占位页面，不调用真实 API）。'
+      if (this.userView === 'family') {
+        const name = this.focusedElderly?.name
+        return name
+          ? `家属视角 · 这里展示关注老人（${name}）的服务订单摘要与评价入口（占位页面，不调用真实 API）。`
+          : '家属视角 · 这里展示关注老人的服务订单摘要与评价入口（占位页面，不调用真实 API）。'
+      }
+      return '通用 USER 视角 · 这里展示我的服务订单摘要与评价入口（占位页面，不调用真实 API）。'
+    }
+  },
+  async mounted() {
+    await this.resolveBindingView()
+  },
+  methods: {
+    normalizePhone(v) {
+      return String(v || '').replace(/\D/g, '')
+    },
+    async resolveBindingView() {
+      if (!this.currentUserId) {
+        this.userView = 'generic'
+        return
+      }
+
+      this.state.loading = true
+      this.state.error = null
+
+      try {
+        const userRes = await getUser(this.currentUserId)
+        const user = userRes.data || null
+        this.currentUser = user
+
+        const [elderlyRes, relativeRes] = await Promise.all([
+          getAllElderly(),
+          getAllRelatives()
+        ])
+
+        const allElderly = Array.isArray(elderlyRes.data) ? elderlyRes.data : []
+        const allRelatives = Array.isArray(relativeRes.data) ? relativeRes.data : []
+
+        const userPhone = this.normalizePhone(user?.phone)
+        const userEmail = (user?.email || '').toLowerCase()
+
+        const elderlyMatch = userPhone
+          ? allElderly.find(e => this.normalizePhone(e?.phoneNumber) === userPhone)
+          : null
+
+        if (elderlyMatch?.id) {
+          this.userView = 'elderly'
+          this.boundRelative = null
+          this.focusedElderly = elderlyMatch
+          return
+        }
+
+        const relativeMatch = allRelatives.find(r => {
+          if (!r) return false
+          const phoneMatch = userPhone && this.normalizePhone(r.phone) === userPhone
+          const emailMatch = userEmail && String(r.email || '').toLowerCase() === userEmail
+          return phoneMatch || emailMatch
+        })
+
+        if (relativeMatch) {
+          this.userView = 'family'
+          this.boundRelative = relativeMatch
+          this.focusedElderly = allElderly.find(e => e?.id === relativeMatch.elderlyId) || null
+          return
+        }
+
+        this.userView = 'generic'
+        this.boundRelative = null
+        this.focusedElderly = null
+      } catch (e) {
+        this.userView = 'generic'
+        this.boundRelative = null
+        this.focusedElderly = null
+        this.state.error = e?.message || '加载绑定关系失败'
+      } finally {
+        this.state.loading = false
+      }
+    }
+  }
 }
 </script>
 

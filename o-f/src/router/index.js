@@ -19,15 +19,19 @@ const routes = [
   },
   {
     path: '/admin',
-    name: 'AdminHome',
-    component: () => import('../modules/Dashboard.vue'),
+    redirect: '/admin/dashboard'
+  },
+  {
+    path: '/admin/dashboard',
+    name: 'AdminDashboard',
+    component: () => import('../modules/admin/AdminDashboard.vue'),
     meta: {
       role: 'ADMIN'
     }
   },
   {
     path: '/dashboard',
-    redirect: '/admin'
+    redirect: '/admin/dashboard'
   },
   {
     path: '/app',
@@ -103,8 +107,20 @@ const routes = [
   },
   {
     path: '/worker',
-    name: 'Worker',
-    component: () => import('../modules/worker/WorkerModule.vue'),
+    redirect: '/worker/tasks'
+  },
+  {
+    path: '/worker/tasks',
+    name: 'WorkerTasks',
+    component: () => import('../modules/worker/WorkerTasks.vue'),
+    meta: {
+      role: 'WORKER'
+    }
+  },
+  {
+    path: '/worker/records',
+    name: 'WorkerRecords',
+    component: () => import('../modules/worker/WorkerRecords.vue'),
     meta: {
       role: 'WORKER'
     }

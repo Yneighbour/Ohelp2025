@@ -35,12 +35,14 @@ export async function loginAndRedirect(params) {
   // 3) 最小持久化：token + 宏 role
   localStorage.setItem('token', auth.token)
   localStorage.setItem('role', role)
+  localStorage.setItem('userId', String(auth.userId))
 
   // 4) 宏角色 -> 入口路由（唯一分发点）
   const targetPath = ROLE_ROUTE_MAP[role]
   if (!targetPath) {
     localStorage.removeItem('token')
     localStorage.removeItem('role')
+    localStorage.removeItem('userId')
     throw new Error('入口路由未配置')
   }
 

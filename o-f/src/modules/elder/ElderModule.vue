@@ -11,6 +11,7 @@
           老人信息管理
         </button>
         <button
+          v-if="!isWorker"
           @click="activeTab = 'relative'"
           :class="['tab-btn', { active: activeTab === 'relative' }]"
         >
@@ -22,7 +23,7 @@
       <ElderlyManager v-if="activeTab === 'elderly'" />
 
       <!-- 亲属信息管理 -->
-      <RelativeManager v-if="activeTab === 'relative'" />
+      <RelativeManager v-if="!isWorker && activeTab === 'relative'" />
     </div>
   </div>
 </template>
@@ -40,6 +41,14 @@ export default {
   data() {
     return {
       activeTab: 'elderly' // 默认显示老人信息管理
+    }
+  },
+  computed: {
+    currentRole() {
+      return localStorage.getItem('role') || ''
+    },
+    isWorker() {
+      return this.currentRole === 'WORKER'
     }
   }
 }
