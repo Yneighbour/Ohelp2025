@@ -12,11 +12,11 @@ const http = axios.create({
 // 请求拦截器
 http.interceptors.request.use(
   config => {
-    // 可以在这里添加认证token等
-    // const token = localStorage.getItem('token')
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    // 仅携带后端返回的 token（不在前端推断权限/角色）
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = token
+    }
     return config
   },
   error => {

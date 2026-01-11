@@ -92,7 +92,8 @@ export function deleteEmergency(id) {
  * @returns {Promise<import('../../shared/types.js').ApiResponse<import('./emergency.types.js').Emergency>>}
  */
 export function respondToEmergency(id, params = {}) {
-  return http.put(`/emergency/${id}/respond`, params)
+  // 后端是 @RequestParam responderId
+  return http.put(`/emergency/${id}/respond`, null, { params })
 }
 
 /**

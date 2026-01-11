@@ -4,153 +4,179 @@
       <h2>认证管理模块</h2>
 
       <!-- 登录表单 -->
-      <div class="card">
-        <h3>用户登录</h3>
+      <BaseCard>
+        <template #header>
+          <h3>用户登录</h3>
+        </template>
+
         <form @submit.prevent="handleLogin" class="form">
-          <div class="form-group">
-            <label for="loginUsername">用户名</label>
-            <input
-              id="loginUsername"
-              v-model="loginForm.username"
-              type="text"
-              required
-            />
+          <BaseInput
+            v-model="loginForm.username"
+            label="用户名"
+            placeholder="请输入用户名"
+            required
+          />
+
+          <BaseInput
+            v-model="loginForm.password"
+            type="password"
+            label="密码"
+            placeholder="请输入密码"
+            required
+          />
+
+          <div class="form-actions">
+            <BaseButton
+              type="submit"
+              variant="primary"
+              :loading="loginState.loading"
+            >
+              登录
+            </BaseButton>
           </div>
-          <div class="form-group">
-            <label for="loginPassword">密码</label>
-            <input
-              id="loginPassword"
-              v-model="loginForm.password"
-              type="password"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn-primary" :disabled="loginState.loading">
-            {{ loginState.loading ? '登录中...' : '登录' }}
-          </button>
+
           <p v-if="loginState.error" class="error">{{ loginState.error }}</p>
         </form>
-      </div>
+      </BaseCard>
 
       <!-- 注册表单 -->
-      <div class="card">
-        <h3>用户注册</h3>
+      <BaseCard>
+        <template #header>
+          <h3>用户注册</h3>
+        </template>
+
         <form @submit.prevent="handleRegister" class="form">
-          <div class="form-group">
-            <label for="registerUsername">用户名</label>
-            <input
-              id="registerUsername"
+          <div class="form-row">
+            <BaseInput
               v-model="registerForm.username"
-              type="text"
+              label="用户名"
+              placeholder="请输入用户名"
               required
             />
-          </div>
-          <div class="form-group">
-            <label for="registerPassword">密码</label>
-            <input
-              id="registerPassword"
-              v-model="registerForm.password"
-              type="password"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="registerEmail">邮箱</label>
-            <input
-              id="registerEmail"
+
+            <BaseInput
               v-model="registerForm.email"
               type="email"
+              label="邮箱"
+              placeholder="请输入邮箱地址"
               required
             />
           </div>
-          <div class="form-group">
-            <label for="registerPhone">电话</label>
-            <input
-              id="registerPhone"
+
+          <div class="form-row">
+            <BaseInput
               v-model="registerForm.phone"
               type="tel"
+              label="电话"
+              placeholder="请输入电话号码"
               required
             />
+
+            <div class="form-group">
+              <label for="registerRole">角色</label>
+              <select id="registerRole" v-model="registerForm.role" class="input" required>
+                <option value="">请选择角色</option>
+                <option value="admin">管理员</option>
+                <option value="worker">工作人员</option>
+                <option value="relative">家属</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="registerRole">角色</label>
-            <select id="registerRole" v-model="registerForm.role" required>
-              <option value="">请选择角色</option>
-              <option value="admin">管理员</option>
-              <option value="worker">工作人员</option>
-              <option value="relative">家属</option>
-            </select>
+
+          <BaseInput
+            v-model="registerForm.password"
+            type="password"
+            label="密码"
+            placeholder="请输入密码"
+            required
+          />
+
+          <div class="form-actions">
+            <BaseButton
+              type="submit"
+              variant="success"
+              :loading="registerState.loading"
+            >
+              注册
+            </BaseButton>
           </div>
-          <button type="submit" class="btn btn-success" :disabled="registerState.loading">
-            {{ registerState.loading ? '注册中...' : '注册' }}
-          </button>
+
           <p v-if="registerState.error" class="error">{{ registerState.error }}</p>
         </form>
-      </div>
+      </BaseCard>
 
       <!-- 令牌验证 -->
-      <div class="card">
-        <h3>令牌验证</h3>
-        <div class="form-group">
-          <label for="validateToken">令牌</label>
-          <input
-            id="validateToken"
+      <BaseCard>
+        <template #header>
+          <h3>令牌验证</h3>
+        </template>
+
+        <div class="token-validation">
+          <BaseInput
             v-model="validateTokenInput"
-            type="text"
+            label="令牌"
             placeholder="输入要验证的令牌"
           />
+
+          <BaseButton
+            @click="handleValidateToken"
+            variant="secondary"
+            :loading="validateState.loading"
+          >
+            验证令牌
+          </BaseButton>
         </div>
-        <button @click="handleValidateToken" class="btn btn-secondary" :disabled="validateState.loading">
-          {{ validateState.loading ? '验证中...' : '验证令牌' }}
-        </button>
+
         <div v-if="validateState.data" class="result">
-          <p>验证结果: {{ validateState.data.valid ? '有效' : '无效' }}</p>
-          <p v-if="validateState.data.valid">
-            用户ID: {{ validateState.data.userId }}<br>
-            用户名: {{ validateState.data.username }}
-          </p>
+          <p><strong>验证结果:</strong> {{ validateState.data.valid ? '有效' : '无效' }}</p>
+          <div v-if="validateState.data.valid" class="valid-info">
+            <p>用户ID: {{ validateState.data.userId }}</p>
+            <p>用户名: {{ validateState.data.username }}</p>
+          </div>
         </div>
+
         <p v-if="validateState.error" class="error">{{ validateState.error }}</p>
-      </div>
+      </BaseCard>
 
       <!-- 认证记录列表 -->
-      <div class="card">
-        <h3>认证记录</h3>
-        <button @click="loadAuthRecords" class="btn btn-primary" :disabled="authListState.loading">
-          {{ authListState.loading ? '加载中...' : '加载认证记录' }}
-        </button>
+      <BaseCard>
+        <template #header>
+          <h3>认证记录</h3>
+          <BaseButton @click="loadAuthRecords" :loading="authListState.loading">
+            加载认证记录
+          </BaseButton>
+        </template>
+
         <div v-if="authListState.error" class="error">{{ authListState.error }}</div>
-        <table v-if="authListState.data.length > 0" class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>用户名</th>
-              <th>用户ID</th>
-              <th>登录时间</th>
-              <th>登出时间</th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="auth in authListState.data" :key="auth.id">
-              <td>{{ auth.id }}</td>
-              <td>{{ auth.username }}</td>
-              <td>{{ auth.userId }}</td>
-              <td>{{ auth.loginTime }}</td>
-              <td>{{ auth.logoutTime || '未登出' }}</td>
-              <td>
-                <span :class="auth.isActive ? 'status status-active' : 'status status-inactive'">
-                  {{ auth.isActive ? '激活' : '未激活' }}
-                </span>
-              </td>
-              <td>
-                <button @click="handleDeleteAuth(auth.id)" class="btn btn-danger btn-sm">删除</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+
+        <BaseTable
+          v-if="authListState.data.length > 0"
+          :columns="authTableColumns"
+          :data="authListState.data"
+          :loading="authListState.loading"
+          row-key="id"
+        >
+          <template #column-status="{ row }">
+            <span :class="row.isActive ? 'status status-active' : 'status status-inactive'">
+              {{ row.isActive ? '激活' : '未激活' }}
+            </span>
+          </template>
+
+          <template #column-logoutTime="{ row }">
+            {{ row.logoutTime || '未登出' }}
+          </template>
+
+          <template #actions="{ row }">
+            <BaseButton
+              @click="handleDeleteAuth(row.id)"
+              variant="danger"
+              size="sm"
+            >
+              删除
+            </BaseButton>
+          </template>
+        </BaseTable>
+      </BaseCard>
     </div>
   </div>
 </template>
@@ -166,8 +192,21 @@ import {
   deleteAuth
 } from './auth.api.js'
 
+import { createUser } from '../user/user.api.js'
+
+import BaseCard from '../../components/base/BaseCard.vue'
+import BaseButton from '../../components/base/BaseButton.vue'
+import BaseInput from '../../components/base/BaseInput.vue'
+import BaseTable from '../../components/base/BaseTable.vue'
+
 export default {
   name: 'AuthModule',
+  components: {
+    BaseCard,
+    BaseButton,
+    BaseInput,
+    BaseTable
+  },
   data() {
     return {
       // 登录表单
@@ -209,6 +248,19 @@ export default {
       }
     }
   },
+  computed: {
+    authTableColumns() {
+      return [
+        { key: 'id', title: 'ID', width: '80px' },
+        { key: 'username', title: '用户名', width: '120px' },
+        { key: 'userId', title: '用户ID', width: '100px' },
+        { key: 'loginTime', title: '登录时间', width: '160px' },
+        { key: 'logoutTime', title: '登出时间', width: '160px' },
+        { key: 'status', title: '状态', width: '100px' },
+        { key: 'actions', title: '操作', width: '100px' }
+      ]
+    }
+  },
   methods: {
     async handleLogin() {
       this.loginState.loading = true
@@ -232,9 +284,23 @@ export default {
       this.registerState.error = null
 
       try {
-        const response = await register(this.registerForm)
-        console.log('注册成功:', response)
-        alert('注册成功！')
+        // 后端 /auth/register 只接受 { username, password, userId }
+        // 这里先创建 user（使用 email/phone/role），再创建 auth 记录。
+        const createdUser = await createUser({
+          name: this.registerForm.username,
+          email: this.registerForm.email,
+          phone: this.registerForm.phone,
+          role: this.registerForm.role
+        })
+
+        const response = await register({
+          username: this.registerForm.username,
+          password: this.registerForm.password,
+          userId: createdUser.data.id
+        })
+
+        console.log('注册成功:', response.data)
+        alert(`注册成功！用户ID: ${createdUser.data.id}`)
         // 清空表单
         this.registerForm = {
           username: '',
@@ -313,9 +379,21 @@ export default {
   gap: 1rem;
 }
 
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--spacing-md);
+}
+
+.token-validation {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-end;
+  margin-bottom: var(--spacing-lg);
+}
+
+.token-validation :deep(.base-input) {
+  flex: 1;
 }
 
 .result {
@@ -323,6 +401,12 @@ export default {
   padding: 1rem;
   background-color: #f8f9fa;
   border-radius: 4px;
+}
+
+.valid-info {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-color);
 }
 
 .error {

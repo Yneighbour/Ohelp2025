@@ -20,7 +20,8 @@ export function login(loginRequest) {
  * @returns {Promise<import('../../shared/types.js').ApiResponse>}
  */
 export function logout(params = {}) {
-  return http.post('/auth/logout', params)
+  // 后端是 @RequestParam authId
+  return http.post('/auth/logout', null, { params })
 }
 
 /**

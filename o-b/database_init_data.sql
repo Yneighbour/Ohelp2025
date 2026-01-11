@@ -22,7 +22,8 @@ INSERT INTO user (name, email, phone, role, is_active) VALUES
 INSERT INTO auth (username, password, user_id, is_active) VALUES
 ('admin', 'admin123', 1, 1),
 ('manager', 'manager123', 2, 1),
-('staff', 'staff123', 3, 1);
+('staff', 'staff123', 3, 1),
+('user', 'user123', 4, 1);
 
 -- ==============================================================
 -- 3. 插入老人信息数据
