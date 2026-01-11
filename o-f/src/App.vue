@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- 顶部导航栏 -->
-    <header v-if="!isLoginPage" class="top-nav">
+    <header v-if="showShell" class="top-nav">
       <div class="logo">Ohelp2025</div>
       <div class="nav-actions">
         <div class="user-menu">
@@ -19,11 +19,11 @@
     </header>
 
     <!-- 侧边栏导航 -->
-    <aside v-if="!isLoginPage" class="sidebar" v-keyboard-navigation="{ selector: '.nav-item' }">
+    <aside v-if="showShell" class="sidebar" v-keyboard-navigation="{ selector: '.nav-item' }">
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-section-title">概览</div>
-          <router-link v-if="canAccess('/dashboard')" to="/dashboard" class="nav-item">
+          <router-link to="/dashboard" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="9" y1="9" x2="15" y2="9"></line>
@@ -37,7 +37,7 @@
 
         <div class="nav-section">
           <div class="nav-section-title">核心功能</div>
-          <router-link v-if="canAccess('/auth')" to="/auth" class="nav-item">
+          <router-link to="/auth" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <circle cx="12" cy="16" r="1"></circle>
@@ -45,7 +45,7 @@
             </svg>
             认证管理
           </router-link>
-          <router-link v-if="canAccess('/user')" to="/user" class="nav-item">
+          <router-link to="/user" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -54,7 +54,7 @@
             </svg>
             用户管理
           </router-link>
-          <router-link v-if="canAccess('/elder')" to="/elder" class="nav-item">
+          <router-link to="/elder" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
@@ -66,7 +66,7 @@
 
         <div class="nav-section">
           <div class="nav-section-title">业务管理</div>
-          <router-link v-if="canAccess('/activity')" to="/activity" class="nav-item">
+          <router-link to="/activity" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M14.828 14.828a4 4 0 0 1-5.656 0"></path>
               <path d="M9 10h1.586a1 1 0 0 1 .707.293l.707.707A1 1 0 0 0 13.414 11H15"></path>
@@ -74,7 +74,7 @@
             </svg>
             活动管理
           </router-link>
-          <router-link v-if="canAccess('/emergency')" to="/emergency" class="nav-item">
+          <router-link to="/emergency" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -82,13 +82,13 @@
             </svg>
             紧急求助
           </router-link>
-          <router-link v-if="canAccess('/health')" to="/health" class="nav-item">
+          <router-link to="/health" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
             健康管理
           </router-link>
-          <router-link v-if="canAccess('/serviceorder')" to="/serviceorder" class="nav-item">
+          <router-link to="/serviceorder" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M9 12l2 2 4-4"></path>
               <path d="M21 12c.552 0 1 .448 1 1v6c0 .552-.448 1-1 1H3c-.552 0-1-.448-1-1v-6c0-.552.448-1 1-1h18z"></path>
@@ -101,13 +101,13 @@
 
         <div class="nav-section">
           <div class="nav-section-title">系统管理</div>
-          <router-link v-if="canAccess('/worker')" to="/worker" class="nav-item">
+          <router-link to="/worker" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
             </svg>
             工作人员
           </router-link>
-          <router-link v-if="canAccess('/file')" to="/file" class="nav-item">
+          <router-link to="/file" class="nav-item">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14,2 14,8 20,8"></polyline>
@@ -119,7 +119,7 @@
     </aside>
 
     <!-- 主内容区域 -->
-    <main :class="isLoginPage ? 'main-content login-main' : 'main-content'">
+    <main :class="showShell ? 'main-content' : 'main-content login-main'">
       <div class="content-wrapper">
         <PageTransition name="router-view">
           <router-view v-slot="{ Component }">
@@ -149,8 +149,8 @@
     <MessageToast ref="messageToast" />
 
     <!-- 移动端底部导航栏 -->
-    <nav v-if="!isLoginPage" id="mobile-nav" class="mobile-nav" v-keyboard-navigation="{ selector: '.mobile-nav-item' }">
-      <router-link v-if="canAccess('/dashboard')" to="/dashboard" class="mobile-nav-item">
+    <nav v-if="!isLoginPage && !isUserApp" id="mobile-nav" class="mobile-nav" v-keyboard-navigation="{ selector: '.mobile-nav-item' }">
+      <router-link to="/dashboard" class="mobile-nav-item">
         <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="9" y1="9" x2="15" y2="9"></line>
@@ -159,7 +159,7 @@
         <span class="mobile-nav-label">概览</span>
       </router-link>
 
-      <router-link v-if="canAccess('/user')" to="/user" class="mobile-nav-item">
+      <router-link to="/user" class="mobile-nav-item">
         <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
@@ -169,7 +169,7 @@
         <span class="mobile-nav-label">用户</span>
       </router-link>
 
-      <router-link v-if="canAccess('/elder')" to="/elder" class="mobile-nav-item">
+      <router-link to="/elder" class="mobile-nav-item">
         <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="12" cy="8" r="4"></circle>
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -177,7 +177,7 @@
         <span class="mobile-nav-label">老人</span>
       </router-link>
 
-      <router-link v-if="canAccess('/emergency')" to="/emergency" class="mobile-nav-item">
+      <router-link to="/emergency" class="mobile-nav-item">
         <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -186,7 +186,7 @@
         <span class="mobile-nav-label">求助</span>
       </router-link>
 
-      <router-link v-if="canAccess('/activity')" to="/activity" class="mobile-nav-item">
+      <router-link to="/activity" class="mobile-nav-item">
         <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -203,7 +203,6 @@ import PageTransition from './components/common/PageTransition.vue'
 import LoadingIndicator from './components/common/LoadingIndicator.vue'
 import MessageToast from './components/common/MessageToast.vue'
 import { MessageService } from './shared/message'
-import { isPathAllowed } from './router/roleAccess.js'
 
 export default {
   name: 'App',
@@ -222,6 +221,14 @@ export default {
       return this.$route?.meta?.public === true && this.$route?.path === '/login'
     },
 
+    isUserApp() {
+      return String(this.$route?.path || '').startsWith('/app')
+    },
+
+    showShell() {
+      return !this.isLoginPage && !this.isUserApp
+    },
+
     currentRole() {
       return localStorage.getItem('role') || ''
     }
@@ -234,21 +241,13 @@ export default {
     this.setupGlobalLoading()
   },
   methods: {
-    canAccess(path) {
-      return isPathAllowed(this.currentRole, path)
-    },
-
     getCurrentRoleLabel() {
       const role = localStorage.getItem('role')
       if (!role) return '未登录'
       const map = {
-        admin: '管理员',
-        manager: '经理',
-        staff: '员工',
-        worker: '工作人员',
-        doctor: '医生',
-        relative: '家属',
-        user: '用户'
+        ADMIN: '管理员',
+        WORKER: '工作人员',
+        USER: '用户'
       }
       return map[role] || role
     },
@@ -256,7 +255,6 @@ export default {
     handleLogout() {
       // 只清理本项目登录态（避免误删其他本地数据）
       localStorage.removeItem('token')
-      localStorage.removeItem('userId')
       localStorage.removeItem('role')
 
       if (this.$message) this.$message.success('已退出登录')

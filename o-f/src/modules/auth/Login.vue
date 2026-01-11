@@ -73,9 +73,8 @@ import BaseCard from '../../components/base/BaseCard.vue'
 import BaseButton from '../../components/base/BaseButton.vue'
 import BaseInput from '../../components/base/BaseInput.vue'
 
-import { login } from './auth.api.js'
-import { getUser } from '../user/user.api.js'
 import { ROLE_ROUTE_MAP } from '../../router/roleMap.js'
+import { loginAndRedirect } from './loginSuccess.js'
 
 export default {
   name: 'Login',
@@ -108,42 +107,11 @@ export default {
       this.state.loading = true
       this.state.error = null
       try {
-        // 1) 登录：拿 token + userId
-        const loginRes = await login({
+        await loginAndRedirect({
           username: this.form.username,
-          password: this.form.password
+          password: this.form.password,
+          router: this.$router
         })
-        const auth = loginRes?.data
-
-        if (!auth?.token || !auth?.userId) {
-          throw new Error('登录返回数据不完整')
-        }
-
-        // 2) 取用户：拿 role（角色只来源于后端）
-        const userRes = await getUser(auth.userId)
-        const user = userRes?.data
-
-        if (!user?.role) {
-          throw new Error('用户角色缺失')
-        }
-
-        // 3) 最小持久化（token / userId / role）
-        localStorage.setItem('token', auth.token)
-        localStorage.setItem('userId', String(auth.userId))
-        localStorage.setItem('role', String(user.role))
-
-        // 4) 角色 -> 入口路由（唯一分发点）
-        const targetPath = ROLE_ROUTE_MAP[user.role]
-        if (!targetPath) {
-          // 兜底：非法角色
-          localStorage.removeItem('token')
-          localStorage.removeItem('userId')
-          localStorage.removeItem('role')
-          this.$router.replace('/login')
-          return
-        }
-
-        this.$router.replace(targetPath)
       } catch (e) {
         const message = e?.message || '登录失败'
         this.state.error = message

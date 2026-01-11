@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { ROLE_ROUTE_MAP } from './roleMap.js'
-import { isPathAllowed } from './roleAccess.js'
-import { MessageService } from '../shared/message.js'
+
 
 // 模块路由
 const routes = [
@@ -19,9 +18,53 @@ const routes = [
     }
   },
   {
+    path: '/admin',
+    name: 'AdminHome',
+    component: () => import('../modules/Dashboard.vue'),
+    meta: {
+      role: 'ADMIN'
+    }
+  },
+  {
     path: '/dashboard',
-    name: 'Dashboard',
-    component: () => import('../modules/Dashboard.vue')
+    redirect: '/admin'
+  },
+  {
+    path: '/app',
+    component: () => import('../layouts/AppLayout.vue'),
+    meta: {
+      role: 'USER'
+    },
+    children: [
+      {
+        path: '',
+        redirect: '/app/home'
+      },
+      {
+        path: 'home',
+        name: 'AppHome',
+        component: () => import('../modules/app/AppHome.vue'),
+        meta: { role: 'USER' }
+      },
+      {
+        path: 'health',
+        name: 'AppHealth',
+        component: () => import('../modules/app/AppHealth.vue'),
+        meta: { role: 'USER' }
+      },
+      {
+        path: 'service',
+        name: 'AppService',
+        component: () => import('../modules/app/AppService.vue'),
+        meta: { role: 'USER' }
+      },
+      {
+        path: 'me',
+        name: 'AppMe',
+        component: () => import('../modules/app/AppMe.vue'),
+        meta: { role: 'USER' }
+      }
+    ]
   },
   {
     path: '/auth',
@@ -61,7 +104,10 @@ const routes = [
   {
     path: '/worker',
     name: 'Worker',
-    component: () => import('../modules/worker/WorkerModule.vue')
+    component: () => import('../modules/worker/WorkerModule.vue'),
+    meta: {
+      role: 'WORKER'
+    }
   },
   {
     path: '/file',
@@ -84,7 +130,7 @@ router.beforeEach((to) => {
 
     const role = localStorage.getItem('role')
     const targetPath = role ? ROLE_ROUTE_MAP[role] : null
-    return targetPath || '/dashboard'
+    return targetPath || true
   }
 
   if (to.meta?.public) {
@@ -94,14 +140,6 @@ router.beforeEach((to) => {
   const token = localStorage.getItem('token')
   if (!token) {
     return '/login'
-  }
-
-  // 软性角色导航限制（防止“所有角色看起来都一样”）
-  const role = localStorage.getItem('role')
-  if (role && !isPathAllowed(role, to.path)) {
-    const targetPath = ROLE_ROUTE_MAP[role] || '/dashboard'
-    MessageService.warning('当前角色无权访问该页面，已为你跳转到默认入口')
-    return targetPath
   }
 
   return true
