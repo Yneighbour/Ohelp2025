@@ -1,3 +1,4 @@
+-- Active: 1765811423701@@127.0.0.1@3306@ohelp
 -- ==============================================================
 -- Ohelp2025 数据库初始化数据脚本（示例数据）
 -- ==============================================================
@@ -19,11 +20,60 @@ INSERT INTO user (name, email, phone, role, is_active) VALUES
 -- 2. 插入认证数据
 -- ==============================================================
 
-INSERT INTO auth (username, password, user_id, is_active) VALUES
-('admin', 'admin123', 1, 1),
-('manager', 'manager123', 2, 1),
-('staff', 'staff123', 3, 1),
-('user', 'user123', 4, 1);
+-- 说明：为避免 user 表自增 ID 在不同环境不一致导致 auth.user_id 失配，
+-- 这里按 user.role 动态绑定到真实的 user.id，并允许重复执行（upsert）。
+
+INSERT INTO auth (username, password, token, user_id, is_active)
+SELECT 'admin', 'admin123', UUID(), id, 1
+FROM user
+WHERE role = 'admin'
+ORDER BY id
+LIMIT 1
+ON DUPLICATE KEY UPDATE
+	password = VALUES(password),
+	token = '',
+	user_id = VALUES(user_id),
+	is_active = 1,
+	logout_time = NULL;
+
+INSERT INTO auth (username, password, token, user_id, is_active)
+SELECT 'manager', 'manager123', UUID(), id, 1
+FROM user
+WHERE role = 'manager'
+ORDER BY id
+LIMIT 1
+ON DUPLICATE KEY UPDATE
+	password = VALUES(password),
+	token = '',
+	user_id = VALUES(user_id),
+	is_active = 1,
+	logout_time = NULL;
+
+INSERT INTO auth (username, password, token, user_id, is_active)
+SELECT 'staff', 'staff123', UUID(), id, 1
+FROM user
+WHERE role = 'staff'
+ORDER BY id
+LIMIT 1
+ON DUPLICATE KEY UPDATE
+	password = VALUES(password),
+	token = '',
+	user_id = VALUES(user_id),
+	is_active = 1,
+	logout_time = NULL;
+
+INSERT INTO auth (username, password, token, user_id, is_active)
+SELECT 'user', 'user123', UUID(), id, 1
+FROM user
+WHERE role = 'user'
+ORDER BY id
+LIMIT 1
+ON DUPLICATE KEY UPDATE
+	password = VALUES(password),
+	token = '',
+	user_id = VALUES(user_id),
+	is_active = 1,
+	logout_time = NULL;
 
 -- ==============================================================
 -- 3. 插入老人信息数据
