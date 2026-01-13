@@ -1,12 +1,11 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-import { MessagePlugin } from './shared/message'
-import { DirectivesPlugin } from './shared/directives'
-import './styles/index.css'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
 
-const app = createApp(App)
-app.use(router)
-app.use(MessagePlugin)
-app.use(DirectivesPlugin)
-app.mount('#app')
+// 复用原静态演示版样式（逐步迁移为组件样式前先保留）
+import '../styles/variables.css';
+import '../styles/common.css';
+import '../styles/profile-pages.css';
+import './styles/main.css';
+
+createApp(App).use(router).mount('#app');

@@ -1,0 +1,722 @@
+/* 个人中心子页面通用样式 */
+
+.profile-info-page,
+.health-records-page,
+.my-activities-page,
+.emergency-contacts-page,
+.settings-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #F9FAFB 0%, #EDE9FE 100%);
+  padding-bottom: var(--spacing-lg);
+}
+
+/* 顶部栏编辑按钮 */
+.top-bar .edit-btn,
+.top-bar .add-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: rgba(124, 58, 237, 0.1);
+  color: #7C3AED;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.top-bar .edit-btn:hover,
+.top-bar .add-btn:hover {
+  background: rgba(124, 58, 237, 0.2);
+}
+
+.top-bar .add-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 内容区域 */
+.profile-info-content,
+.health-records-content,
+.my-activities-content,
+.emergency-contacts-content,
+.settings-content {
+  padding: var(--spacing-lg);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+
+/* ==================== 个人资料页面 ==================== */
+
+.info-section {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid rgba(124, 58, 237, 0.05);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item:hover {
+  background: rgba(124, 58, 237, 0.03);
+}
+
+.info-label {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.info-value {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+}
+
+.avatar-preview {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.info-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--text-disabled);
+}
+
+
+/* ==================== 健康档案页面 ==================== */
+
+.record-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.record-item {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  text-align: center;
+}
+
+.record-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.record-value {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 疾病列表 */
+.disease-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.disease-item {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.disease-icon {
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.disease-info {
+  flex: 1;
+}
+
+.disease-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.disease-time {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.disease-status {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.disease-status.controlled {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #059669;
+}
+
+/* 过敏标签 */
+.allergy-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.allergy-tag {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #DC2626;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* 用药列表 */
+.medicine-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.medicine-item {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+}
+
+.medicine-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.medicine-usage {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 体检记录 */
+.checkup-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.checkup-item {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checkup-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+.checkup-date {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  min-width: 80px;
+}
+
+.checkup-name {
+  flex: 1;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.checkup-result {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.checkup-result.success {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #059669;
+}
+
+.checkup-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--text-disabled);
+}
+
+
+/* ==================== 我的活动页面 ==================== */
+
+.activity-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.stat-item {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.my-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.my-activity-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  border-left: 4px solid #7C3AED;
+}
+
+.my-activity-card.completed {
+  opacity: 0.7;
+  border-left-color: #D1D5DB;
+}
+
+.activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.activity-name {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.activity-status {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.activity-status.upcoming {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  color: #1D4ED8;
+}
+
+.activity-status.completed {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #059669;
+}
+
+.activity-info {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.activity-info-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.activity-info-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+.activity-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.action-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 8px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  color: var(--white);
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.action-btn.secondary {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7C3AED;
+}
+
+.action-btn.secondary:hover {
+  background: rgba(124, 58, 237, 0.2);
+}
+
+
+/* ==================== 紧急联系人页面 ==================== */
+
+.contacts-tip {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  border-radius: 12px;
+  margin-bottom: var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  color: #1D4ED8;
+}
+
+.contacts-tip svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.emergency-contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.emergency-contact-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 16px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.contact-priority {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.contact-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+  color: #7C3AED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.contact-details {
+  flex: 1;
+}
+
+.contact-name {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.contact-relation {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.contact-phone {
+  font-size: var(--font-size-sm);
+  color: var(--text-disabled);
+}
+
+.contact-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.contact-action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-circle);
+  background: rgba(124, 58, 237, 0.1);
+  color: #7C3AED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contact-action-btn:hover {
+  background: rgba(124, 58, 237, 0.2);
+  transform: scale(1.1);
+}
+
+.contact-action-btn.delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
+.contact-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.contact-action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.contacts-note {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+}
+
+.note-title {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: #92400E;
+  margin-bottom: var(--spacing-sm);
+}
+
+.note-list {
+  list-style: none;
+  padding: 0;
+}
+
+.note-list li {
+  font-size: var(--font-size-sm);
+  color: #92400E;
+  padding-left: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+  position: relative;
+}
+
+.note-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+}
+
+
+/* ==================== 系统设置页面 ==================== */
+
+.settings-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.setting-item {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+  border-radius: 12px;
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.setting-item.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.setting-item.clickable:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.setting-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.setting-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--text-disabled);
+}
+
+/* 开关按钮 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #D1D5DB;
+  transition: 0.4s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* 清除缓存按钮 */
+.clear-cache-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border-radius: 12px;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clear-cache-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .record-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .activity-stats {
+    grid-template-columns: 1fr;
+  }
+}

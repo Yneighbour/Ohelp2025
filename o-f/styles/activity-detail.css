@@ -1,0 +1,162 @@
+/* 活动详情页面样式 */
+
+.activity-detail-page {
+  min-height: 100vh;
+  background-color: var(--background-color);
+  padding-bottom: 80px;
+}
+
+/* 活动详情头部 */
+.activity-detail-header {
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.activity-image-large {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-md);
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.activity-detail-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 活动详情信息 */
+.activity-detail-info {
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin: 0 var(--spacing-md) var(--spacing-md);
+  box-shadow: var(--shadow-md);
+}
+
+.info-item {
+  display: flex;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  min-width: 60px;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+/* 活动详情内容区块 */
+.activity-detail-section {
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  margin: 0 var(--spacing-md) var(--spacing-md);
+  box-shadow: var(--shadow-md);
+}
+
+.activity-detail-section .section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.activity-detail-section .section-content {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: var(--line-height-lg);
+}
+
+/* 参与者列表 */
+.participants-list {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.participant-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: var(--font-size-sm);
+  font-weight: bold;
+}
+
+/* 底部操作按钮 */
+.activity-detail-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--white);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.action-btn {
+  flex: 1;
+  min-height: var(--min-touch-target);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn-primary {
+  background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%);
+  color: var(--white);
+}
+
+.action-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.action-btn-secondary {
+  background-color: var(--background-color);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.action-btn-secondary:hover {
+  background-color: var(--border-color);
+}
+
+/* 响应式 */
+@media (min-width: 768px) {
+  .activity-detail-content {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+  }
+  
+  .activity-detail-footer {
+    max-width: var(--max-width);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

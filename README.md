@@ -17,11 +17,11 @@
 - Spring Data JPA（项目依赖中包含，个别模块可能使用/保留）
 
 ### 前端
-- Vue 3 + Composition API
+- Vue 3（JS）
 - Vue Router 4（路由管理）
 - Vite（构建工具）
-- Axios（HTTP请求）
-- ECharts（图表）
+- Axios（HTTP 请求）
+- Canvas 2D（趋势图绘制）
 
 ## 功能特性
 
@@ -66,6 +66,8 @@ npm run dev
 ```
 3. 服务将在 http://localhost:5173 启动
 
+> 说明：`o-f` 目录下原有的 `index.html` 与 `scripts/` 纯静态实现仅作为设计与对照参考，实际运行入口已完全迁移到 Vue 3 + Vite（`src/main.js` + `src/router` + `src/views`）。UI 展示与静态版保持一致，包括用户端与管理端后台页面。
+
 ## 数据库配置
 
 项目默认使用 MySQL（见 `o-b/src/main/resources/application.properties`）。
@@ -85,8 +87,8 @@ mysql -u root -p ohelp < "o-b\database_init_data.sql"
 
 ## 前后端联调约定（重要）
 
-- 前端未配置 Vite proxy（见 `o-f/vite.config.js`），请求直接发往后端；后端地址在 `o-f/src/shared/http.js` 里硬编码为 `http://localhost:8080/api`。
-- 后端所有接口返回统一包裹：`{ code, message, data? }`；前端在 `o-f/src/shared/http.js` 里会对 `code !== 200 && code !== 201` 直接报错。
+- 前端通过 Vite proxy 代理 `/api` 到后端（见 `o-f/vite.config.js`），默认 API baseURL 为 `/api`（见 `o-f/.env.example` 与 `o-f/src/api/http.js`）。
+- 后端所有接口返回统一包裹：`{ code, message, data? }`；前端在 `o-f/src/api/http.js` 里会对 `code !== 200 && code !== 201` 直接报错。
 - 登录返回自定义 token（UUID），前端会保存到 `localStorage['token']` 并放到 `Authorization` header；后端目前没有全局鉴权拦截（仅提供 `GET /auth/validate/{token}`）。
 
 ## 文档与入口
@@ -94,3 +96,4 @@ mysql -u root -p ohelp < "o-b\database_init_data.sql"
 - 后端 API 文档：`o-b/COMPLETE_API_DOCUMENTATION.md`、`o-b/INTERFACE_SUMMARY.md`
 - 后端入口类：`o-b/src/main/java/com/soft/ob/OBApplication.java`
 - 前端路由入口：`o-f/src/router/index.js`
+

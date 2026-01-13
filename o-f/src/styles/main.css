@@ -1,0 +1,9 @@
+/* Vue 版轻量补充：尽量复用 o-f/styles/ 下原有静态演示样式 */
+
+:root {
+  color-scheme: light;
+}
+
+.error {
+  color: #d4380d;
+}
