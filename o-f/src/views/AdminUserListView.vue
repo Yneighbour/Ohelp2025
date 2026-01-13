@@ -89,13 +89,42 @@ function onToggle(row) {
   const action = row.status === 'active' ? '禁用' : '启用';
   const ok = window.confirm(`确定要${action}“${row.username}”吗？`);
   if (!ok) return;
-  window.alert(`已${action}${row.username}\n\n（演示版本，实际会调用后端API更新状态）`);
+
+  loading.value = true;
+  error.value = '';
+  const fn = row.status === 'active' ? usersApi.deactivateUser : usersApi.activateUser;
+  fn(row.id)
+    .then(() => {
+      window.alert(`${action}成功`);
+      return load();
+    })
+    .catch((e) => {
+      console.error(e);
+      window.alert(`${action}失败，请稍后重试`);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onDelete(row) {
   const ok = window.confirm(`确定要删除“${row.username}”吗？\n\n此操作不可恢复！`);
   if (!ok) return;
-  window.alert(`已删除${row.username} (ID: ${row.id})\n\n（演示版本，实际会调用后端API删除）`);
+  loading.value = true;
+  error.value = '';
+  usersApi
+    .deleteUser(row.id)
+    .then(() => {
+      window.alert('删除成功');
+      return load();
+    })
+    .catch((e) => {
+      console.error(e);
+      window.alert('删除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 onMounted(load);

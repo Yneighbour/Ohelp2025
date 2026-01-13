@@ -15,3 +15,23 @@ export async function listByCategory(category) {
 export async function listByStatus(status) {
   return requestData({ method: 'GET', url: `/activity/status/${encodeURIComponent(status)}` });
 }
+
+export async function createActivity(payload) {
+  return requestData({ method: 'POST', url: '/activity/', data: payload });
+}
+
+export async function updateActivity(id, payload) {
+  return requestData({ method: 'PUT', url: `/activity/${id}` , data: payload });
+}
+
+export async function deleteActivity(id) {
+  return requestData({ method: 'DELETE', url: `/activity/${id}` });
+}
+
+export async function activateActivity(id) {
+  return requestData({ method: 'PUT', url: `/activity/${id}/activate` });
+}
+
+export async function deactivateActivity(id) {
+  return requestData({ method: 'PUT', url: `/activity/${id}/deactivate` });
+}

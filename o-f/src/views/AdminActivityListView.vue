@@ -102,7 +102,21 @@ function onEdit(row) {
 function onCancel(row) {
   const ok = window.confirm(`确定要取消活动“${row.name}”吗？\n\n已报名的用户将收到取消通知。`);
   if (!ok) return;
-  window.alert(`已取消活动：${row.name}\n\n（演示版本，实际会调用后端API并发送通知）`);
+  loading.value = true;
+  error.value = '';
+  activityApi
+    .deactivateActivity(row.id)
+    .then(() => {
+      window.alert(`已取消活动：${row.name}`);
+      return load();
+    })
+    .catch((e) => {
+      console.error(e);
+      window.alert('取消失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 onMounted(load);

@@ -83,19 +83,47 @@ function onAdd() {
 function onConfirm(row) {
   const ok = window.confirm(`确定要确认预约单“${row.orderNo}”吗？`);
   if (!ok) return;
-  window.alert(`已确认预约单：${row.orderNo}\n\n（演示版本，实际会调用后端API更新状态）`);
+  window.alert(`已确认预约单：${row.orderNo}\n\n（当前版本暂未对接后端确认接口）`);
 }
 
 function onCancel(row) {
   const ok = window.confirm(`确定要取消预约单“${row.orderNo}”吗？`);
   if (!ok) return;
-  window.alert(`已取消预约单：${row.orderNo}\n\n（演示版本，实际会调用后端API更新状态）`);
+  loading.value = true;
+  error.value = '';
+  serviceOrderApi
+    .cancel(row.id)
+    .then(() => {
+      window.alert(`已取消预约单：${row.orderNo}`);
+      return load();
+    })
+    .catch((e) => {
+      console.error(e);
+      window.alert('取消失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onComplete(row) {
   const ok = window.confirm(`确定要将预约单“${row.orderNo}”标记为已完成吗？`);
   if (!ok) return;
-  window.alert(`预约单${row.orderNo}已完成\n\n（演示版本，实际会调用后端API更新状态）`);
+  loading.value = true;
+  error.value = '';
+  serviceOrderApi
+    .complete(row.id)
+    .then(() => {
+      window.alert(`预约单${row.orderNo}已完成`);
+      return load();
+    })
+    .catch((e) => {
+      console.error(e);
+      window.alert('操作失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onDetail(row) {
