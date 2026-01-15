@@ -20,6 +20,14 @@ function go(path) {
 function backToFront() {
   router.push('/profile');
 }
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  localStorage.removeItem('username');
+  localStorage.removeItem('userId');
+  router.push('/login');
+}
 </script>
 
 <template>
@@ -98,7 +106,8 @@ function backToFront() {
       <div class="admin-topbar">
         <h1>{{ title }}</h1>
         <div class="admin-topbar-actions">
-          <span style="color: var(--text-secondary)">管理员</span>
+          <span style="color: var(--text-secondary); margin-right: 12px">管理员</span>
+          <button type="button" class="admin-logout-btn" @click="logout">退出登录</button>
         </div>
       </div>
 

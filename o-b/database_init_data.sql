@@ -99,19 +99,19 @@ INSERT INTO relative (elderly_id, name, phone, relationship, email, is_primary_c
 -- 5. 插入活动数据
 -- ==============================================================
 
-INSERT INTO activity (name, category, description, location, start_time, end_time, participants, status, is_active) VALUES
-('太极拳课程', '健身活动', '每周三、五上午进行', '活动室A', '2026-01-15 09:00:00', '2026-01-15 10:30:00', 12, '进行中', 1),
-('书法班', '文化活动', '每周一上午进行', '书法室', '2026-01-20 10:00:00', '2026-01-20 11:30:00', 8, '已完成', 1),
-('棋类比赛', '娱乐活动', '象棋、围棋友谊赛', '活动室B', '2026-02-01 14:00:00', '2026-02-01 16:00:00', 15, '计划中', 1);
+INSERT INTO activity (name, category, description, location, start_time, end_time, participants, organizer_id, status, is_active) VALUES
+('太极拳课程', '健身活动', '每周三、五上午进行', '活动室A', '2026-01-15 09:00:00', '2026-01-15 10:30:00', 12, 2, '进行中', 1),
+('书法班', '文化活动', '每周一上午进行', '书法室', '2026-01-20 10:00:00', '2026-01-20 11:30:00', 8, 2, '已完成', 1),
+('棋类比赛', '娱乐活动', '象棋、围棋友谊赛', '活动室B', '2026-02-01 14:00:00', '2026-02-01 16:00:00', 15, 2, '计划中', 1);
 
 -- ==============================================================
 -- 6. 插入紧急求助数据
 -- ==============================================================
 
-INSERT INTO emergency (elderly_id, type, description, location, contact_phone, status, priority, is_active) VALUES
-(1, '摔跤', '在家摔倒', '北京市朝阳区', '13900139001', 'resolved', 'high', 1),
-(2, '身体不适', '突然头晕', '北京市朝阳区', '13900139002', 'responded', 'high', 1),
-(3, '需要帮助', '日常生活困难', '北京市东城区', '13900139003', 'pending', 'medium', 1);
+INSERT INTO emergency (elderly_id, type, description, location, contact_phone, status, responder_id, response_time, resolved_time, priority, is_active) VALUES
+(1, '摔跤', '在家摔倒', '北京市朝阳区', '13900139001', 'resolved', 3, '2026-01-08 10:15:00', '2026-01-08 11:30:00', 'high', 1),
+(2, '身体不适', '突然头晕', '北京市朝阳区', '13900139002', 'responded', 3, '2026-01-09 14:20:00', NULL, 'high', 1),
+(3, '需要帮助', '日常生活困难', '北京市东城区', '13900139003', 'pending', NULL, NULL, NULL, 'medium', 1);
 
 -- ==============================================================
 -- 7. 插入健康记录数据
@@ -146,10 +146,10 @@ INSERT INTO worker (name, email, phone, position, department, specialization, hi
 -- 10. 插入文件记录数据
 -- ==============================================================
 
-INSERT INTO file_record (filename, original_filename, file_type, file_size, file_path, uploader_id, entity_type, entity_id, description, is_active) VALUES
-('elderly_001_photo.jpg', '李老人照片.jpg', 'image/jpeg', 524288, '/uploads/elderly/001/', 1, 'elderly', 1, '老人身份照', 1),
-('health_record_001.pdf', '健康记录.pdf', 'application/pdf', 102400, '/uploads/health/001/', 2, 'health_record', 1, '健康检查报告', 1),
-('service_order_001.doc', '服务订单.doc', 'application/msword', 51200, '/uploads/service/', 3, 'service_order', 1, '服务订单合同', 1);
+INSERT INTO file_record (filename, original_filename, file_type, file_size, file_path, url, uploader_id, entity_type, entity_id, description, is_active) VALUES
+('elderly_001_photo.jpg', '李老人照片.jpg', 'image/jpeg', 524288, '/uploads/elderly/001/', 'http://localhost:8080/api/files/elderly_001_photo.jpg', 1, 'elderly', 1, '老人身份照', 1),
+('health_record_001.pdf', '健康记录.pdf', 'application/pdf', 102400, '/uploads/health/001/', 'http://localhost:8080/api/files/health_record_001.pdf', 2, 'health_record', 1, '健康检查报告', 1),
+('service_order_001.doc', '服务订单.doc', 'application/msword', 51200, '/uploads/service/', 'http://localhost:8080/api/files/service_order_001.doc', 3, 'service_order', 1, '服务订单合同', 1);
 
 -- ==============================================================
 -- 数据初始化完毕
