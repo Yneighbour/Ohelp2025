@@ -1,14 +1,53 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import AdminLayout from '../components/admin/AdminLayout.vue';
+import * as workerApi from '../api/worker';
 import { adminServicesData, serviceCategories } from '../data/admin';
 
+const loading = ref(false);
+const error = ref('');
 const keyword = ref('');
 const categoryFilter = ref('all');
 const statusFilter = ref('all');
 
-const rows = ref(adminServicesData.slice());
+const rows = ref([]);
+
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  name: '',
+  email: '',
+  phone: '',
+  position: '',
+  department: '',
+  specialization: '',
+  salary: null,
+  isAvailable: true,
+  isActive: true,
+});
+
+function formatDate(value) {
+  if (!value) return '';
+  const s = String(value);
+  return s.length >= 10 ? s.slice(0, 10) : s;
+}
+
+function mapWorker(w) {
+  return {
+    id: w?.id ?? '-',
+    name: w?.name || '-',
+    category: w?.department || 'other',
+    categoryText: w?.department || '其他',
+    price: w?.salary != null ? `¥${w.salary}` : '-',
+    status: w?.isAvailable === false ? 'offline' : 'online',
+    statusText: w?.isAvailable === false ? '下架' : '上架',
+    description: w?.specialization || w?.position || '-',
+    createTime: formatDate(w?.createdAt || w?.hireDate),
+  };
+}
 
 const filteredRows = computed(() => {
   const list = Array.isArray(rows.value) ? rows.value : [];
@@ -21,33 +60,150 @@ const filteredRows = computed(() => {
   });
 });
 
-function onSearch() {
-  if (!keyword.value.trim()) {
-    window.alert('请输入搜索关键词');
-    return;
+async function load() {
+  loading.value = true;
+  error.value = '';
+  try {
+    const data = await workerApi.listAll();
+    if (Array.isArray(data) && data.length) {
+      rows.value = data.map(mapWorker);
+      return;
+    }
+    rows.value = adminServicesData.slice();
+  } catch (e) {
+    error.value = '后端接口不可用，已切换为演示数据';
+    rows.value = adminServicesData.slice();
+  } finally {
+    loading.value = false;
   }
 }
 
+function onSearch() {
+  // 搜索功能已通过computed filteredRows实现，这里保留空函数
+}
+
 function onAdd() {
-  window.alert('添加服务\n\n（演示版本，实际会打开添加表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    name: '',
+    email: '',
+    phone: '',
+    position: '',
+    department: '',
+    specialization: '',
+    salary: null,
+    isAvailable: true,
+    isActive: true,
+  };
+  dialogVisible.value = true;
 }
 
 function onEdit(row) {
-  window.alert(`编辑${row.name} (ID: ${row.id})\n\n（演示版本，实际会打开编辑表单）`);
+  dialogMode.value = 'edit';
+  loading.value = true;
+  workerApi.getById(row.id)
+    .then(data => {
+      dialogForm.value = {
+        id: data.id,
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        position: data.position || '',
+        department: data.department || '',
+        specialization: data.specialization || '',
+        salary: data.salary || null,
+        isAvailable: data.isAvailable !== false,
+        isActive: data.isActive !== false,
+      };
+      dialogVisible.value = true;
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('获取服务人员信息失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onToggle(row) {
   const action = row.status === 'online' ? '下架' : '上架';
   const ok = window.confirm(`确定要${action}服务“${row.name}”吗？`);
   if (!ok) return;
-  window.alert(`已${action}服务：${row.name}\n\n（演示版本，实际会调用后端API更新状态）`);
+  
+  loading.value = true;
+  error.value = '';
+  const apiCall = row.status === 'online' 
+    ? workerApi.setAvailability(row.id, false)
+    : workerApi.setAvailability(row.id, true);
+  
+  apiCall
+    .then(() => {
+      window.alert(`已${action}服务：${row.name}`);
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert(`${action}失败，请稍后重试`);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onDelete(row) {
-  const ok = window.confirm(`确定要删除“${row.name}”吗？\n\n此操作不可恢复！`);
+  const ok = window.confirm(`确定要删除"${row.name}"吗？\n\n此操作不可恢复！`);
   if (!ok) return;
-  window.alert(`已删除${row.name} (ID: ${row.id})\n\n（演示版本，实际会调用后端API删除）`);
+  
+  loading.value = true;
+  error.value = '';
+  workerApi.deleteWorker(row.id)
+    .then(() => {
+      window.alert('删除成功');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('删除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.name || !form.email || !form.phone) {
+    window.alert('姓名、邮箱和电话为必填项');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      await workerApi.createWorker(form);
+      window.alert('添加成功');
+    } else {
+      await workerApi.updateWorker(form.id, form);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(load);
 </script>
 
 <template>
@@ -72,6 +228,9 @@ function onDelete(row) {
         <button class="admin-add-btn" type="button" @click="onAdd">+ 添加服务</button>
       </div>
     </div>
+
+    <div v-if="loading" style="color: var(--text-secondary); padding: 6px 0">正在加载...</div>
+    <div v-else-if="error" style="color: var(--warning-color); padding: 6px 0">{{ error }}</div>
 
     <div class="admin-table-container">
       <table class="admin-table">
@@ -118,6 +277,62 @@ function onDelete(row) {
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新增/编辑对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click.self="closeDialog">
+      <div class="admin-dialog">
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '添加服务人员' : '编辑服务人员' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>姓名 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.name" type="text" placeholder="请输入姓名" />
+          </div>
+          <div class="admin-form-group">
+            <label>邮箱 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.email" type="email" placeholder="请输入邮箱" />
+          </div>
+          <div class="admin-form-group">
+            <label>电话 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.phone" type="tel" placeholder="请输入电话号码" />
+          </div>
+          <div class="admin-form-group">
+            <label>职位</label>
+            <input v-model="dialogForm.position" type="text" placeholder="请输入职位，如：护理员、医生" />
+          </div>
+          <div class="admin-form-group">
+            <label>部门</label>
+            <input v-model="dialogForm.department" type="text" placeholder="请输入部门" />
+          </div>
+          <div class="admin-form-group">
+            <label>专长</label>
+            <input v-model="dialogForm.specialization" type="text" placeholder="请输入专长或服务范围" />
+          </div>
+          <div class="admin-form-group">
+            <label>薪资</label>
+            <input v-model.number="dialogForm.salary" type="number" step="0.01" placeholder="请输入薪资" />
+          </div>
+          <div class="admin-form-group">
+            <label>
+              <input v-model="dialogForm.isAvailable" type="checkbox" />
+              可接单状态
+            </label>
+          </div>
+          <div class="admin-form-group">
+            <label>
+              <input v-model="dialogForm.isActive" type="checkbox" />
+              启用状态
+            </label>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-dialog-btn cancel" @click="closeDialog">取消</button>
+          <button class="admin-dialog-btn confirm" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

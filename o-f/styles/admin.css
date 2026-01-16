@@ -722,3 +722,208 @@
   flex: 1;
   text-align: center;
 }
+/* ========== 对话框样式 ========== */
+.admin-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.admin-dialog {
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--background-secondary);
+}
+
+.admin-dialog-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.admin-dialog-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.admin-dialog-close:hover {
+  color: var(--error-color);
+}
+
+.admin-dialog-body {
+  padding: 20px;
+}
+
+.admin-form-group {
+  margin-bottom: 16px;
+}
+
+.admin-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.admin-form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.admin-form-group input[type="text"],
+.admin-form-group input[type="password"],
+.admin-form-group input[type="email"],
+.admin-form-group input[type="number"],
+.admin-form-group input[type="date"],
+.admin-form-group input[type="datetime-local"],
+.admin-form-group select,
+.admin-form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: var(--transition-fast);
+  background: var(--white);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.admin-form-group input[type="text"]:focus,
+.admin-form-group input[type="password"]:focus,
+.admin-form-group input[type="email"]:focus,
+.admin-form-group input[type="number"]:focus,
+.admin-form-group input[type="date"]:focus,
+.admin-form-group input[type="datetime-local"]:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.admin-form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.admin-form-group input[type="checkbox"] {
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.admin-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--background-secondary);
+}
+
+.admin-dialog-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-weight: 500;
+}
+
+.admin-dialog-btn.cancel {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+.admin-dialog-btn.cancel:hover {
+  background: var(--background-secondary);
+  opacity: 0.8;
+}
+
+.admin-dialog-btn.confirm {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+.admin-dialog-btn.confirm:hover {
+  background: var(--primary-dark);
+}
+
+.admin-btn-primary {
+  padding: 8px 20px;
+  background: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-weight: 500;
+}
+
+.admin-btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.admin-btn-secondary {
+  padding: 8px 20px;
+  background: var(--border-color);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-weight: 500;
+}
+
+.admin-btn-secondary:hover {
+  background: var(--background-secondary);
+  opacity: 0.8;
+}

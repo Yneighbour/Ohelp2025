@@ -152,5 +152,118 @@ INSERT INTO file_record (filename, original_filename, file_type, file_size, file
 ('service_order_001.doc', '服务订单.doc', 'application/msword', 51200, '/uploads/service/', 'http://localhost:8080/api/files/service_order_001.doc', 3, 'service_order', 1, '服务订单合同', 1);
 
 -- ==============================================================
+-- 11. 插入角色数据
+-- ==============================================================
+
+INSERT INTO role (name, code, description, is_active) VALUES
+('系统管理员', 'admin', '拥有系统所有权限', 1),
+('操作员', 'operator', '可管理日常业务，无法修改系统配置', 1),
+('普通用户', 'user', '仅可查看和管理个人相关信息', 1);
+
+-- ==============================================================
+-- 12. 插入权限数据
+-- ==============================================================
+
+INSERT INTO permission (name, code, module, description, is_active) VALUES
+-- 用户管理权限
+('用户列表查看', 'user:view', '用户管理', '查看用户列表', 1),
+('用户信息创建', 'user:create', '用户管理', '创建新用户', 1),
+('用户信息编辑', 'user:update', '用户管理', '编辑用户信息', 1),
+('用户信息删除', 'user:delete', '用户管理', '删除用户', 1),
+
+-- 老人管理权限
+('老人列表查看', 'elderly:view', '老人管理', '查看老人列表', 1),
+('老人信息创建', 'elderly:create', '老人管理', '创建老人档案', 1),
+('老人信息编辑', 'elderly:update', '老人管理', '编辑老人信息', 1),
+('老人信息删除', 'elderly:delete', '老人管理', '删除老人档案', 1),
+
+-- 活动管理权限
+('活动列表查看', 'activity:view', '活动管理', '查看活动列表', 1),
+('活动创建', 'activity:create', '活动管理', '创建新活动', 1),
+('活动编辑', 'activity:update', '活动管理', '编辑活动信息', 1),
+('活动删除', 'activity:delete', '活动管理', '删除活动', 1),
+('活动报名管理', 'activity:enrollment', '活动管理', '管理活动报名', 1),
+
+-- 健康管理权限
+('健康记录查看', 'health:view', '健康管理', '查看健康记录', 1),
+('健康记录创建', 'health:create', '健康管理', '创建健康记录', 1),
+('健康记录编辑', 'health:update', '健康管理', '编辑健康记录', 1),
+('健康记录删除', 'health:delete', '健康管理', '删除健康记录', 1),
+
+-- 紧急呼叫权限
+('紧急呼叫查看', 'emergency:view', '紧急呼叫', '查看紧急呼叫记录', 1),
+('紧急呼叫处理', 'emergency:handle', '紧急呼叫', '处理紧急呼叫', 1),
+
+-- 服务订单权限
+('服务订单查看', 'service:view', '服务订单', '查看服务订单', 1),
+('服务订单创建', 'service:create', '服务订单', '创建服务订单', 1),
+('服务订单编辑', 'service:update', '服务订单', '编辑服务订单', 1),
+('服务订单删除', 'service:delete', '服务订单', '删除服务订单', 1),
+
+-- 角色管理权限
+('角色列表查看', 'role:view', '角色管理', '查看角色列表', 1),
+('角色创建', 'role:create', '角色管理', '创建新角色', 1),
+('角色编辑', 'role:update', '角色管理', '编辑角色信息', 1),
+('角色删除', 'role:delete', '角色管理', '删除角色', 1),
+
+-- 权限管理权限
+('权限列表查看', 'permission:view', '权限管理', '查看权限列表', 1),
+('权限配置', 'permission:assign', '权限管理', '为角色配置权限', 1);
+
+-- ==============================================================
+-- 13. 插入角色权限关联数据
+-- ==============================================================
+
+-- 系统管理员：拥有所有权限
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 
+  (SELECT id FROM role WHERE code = 'admin'),
+  id
+FROM permission
+WHERE is_active = 1;
+
+-- 操作员：拥有日常业务管理权限（除角色和权限管理外）
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 
+  (SELECT id FROM role WHERE code = 'operator'),
+  id
+FROM permission
+WHERE module IN ('用户管理', '老人管理', '活动管理', '健康管理', '紧急呼叫', '服务订单')
+  AND is_active = 1;
+
+-- 普通用户：仅拥有查看权限
+INSERT INTO role_permission (role_id, permission_id)
+SELECT 
+  (SELECT id FROM role WHERE code = 'user'),
+  id
+FROM permission
+WHERE code LIKE '%:view'
+  AND module NOT IN ('角色管理', '权限管理')
+  AND is_active = 1;
+
+-- ==============================================================
+-- 14. 插入活动报名数据
+-- ==============================================================
+
+INSERT INTO enrollment (activity_id, elderly_id, status, enroll_time, check_in_time, notes, is_active) VALUES
+-- 太极拳课程的报名
+(1, 1, 'attended', DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 7 DAY), '已参加太极拳课程', 1),
+(1, 2, 'confirmed', DATE_SUB(NOW(), INTERVAL 6 DAY), NULL, '已确认参加', 1),
+(1, 3, 'pending', DATE_SUB(NOW(), INTERVAL 5 DAY), NULL, '刚报名，待管理员确认', 1),
+(1, 4, 'cancelled', DATE_SUB(NOW(), INTERVAL 4 DAY), NULL, '因身体不适取消', 1),
+
+-- 书法班的报名
+(2, 1, 'attended', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 10 DAY), '参加书法班学习', 1),
+(2, 2, 'attended', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 10 DAY), '完成书法班课程', 1),
+(2, 3, 'pending', DATE_SUB(NOW(), INTERVAL 9 DAY), NULL, '新报名', 1),
+(2, 4, 'absent', DATE_SUB(NOW(), INTERVAL 11 DAY), NULL, '缺课', 1),
+
+-- 棋类比赛的报名
+(3, 1, 'confirmed', DATE_SUB(NOW(), INTERVAL 2 DAY), NULL, '已确认参加比赛', 1),
+(3, 2, 'pending', NOW(), NULL, '新报名棋类比赛', 1),
+(3, 3, 'confirmed', DATE_SUB(NOW(), INTERVAL 1 DAY), NULL, '已确认参加比赛', 1),
+(3, 4, 'pending', NOW(), NULL, '报名比赛中', 1);
+
+-- ==============================================================
 -- 数据初始化完毕
 -- ==============================================================

@@ -12,6 +12,19 @@ const keyword = ref('');
 const statusFilter = ref('all');
 
 const rows = ref([]);
+const elderOptions = ref([]); // 老人选项列表
+
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  elderlyId: null,
+  name: '',
+  relationship: '',
+  phone: '',
+  isActive: true,
+});
 
 function formatDate(value) {
   if (!value) return '';
@@ -52,6 +65,11 @@ async function load() {
       relativeApi.listAll().catch(() => []),
     ]);
 
+    // 保存老人选项用于对话框
+    if (Array.isArray(elders)) {
+      elderOptions.value = elders.map(e => ({ id: e.id, name: e.name || `老人#${e.id}` }));
+    }
+
     if (Array.isArray(relatives) && relatives.length) {
       const map = new Map();
       if (Array.isArray(elders)) {
@@ -78,7 +96,16 @@ function onSearch() {
 }
 
 function onAdd() {
-  window.alert('添加家属绑定\n\n（演示版本，实际会打开添加表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    elderlyId: elderOptions.value[0]?.id || null,
+    name: '',
+    relationship: '',
+    phone: '',
+    isActive: true,
+  };
+  dialogVisible.value = true;
 }
 
 function onInvite(row) {
@@ -86,13 +113,78 @@ function onInvite(row) {
 }
 
 function onEdit(row) {
-  window.alert(`编辑${row.elderName}与${row.familyName}的绑定 (ID: ${row.id})\n\n（演示版本，实际会打开编辑表单）`);
+  dialogMode.value = 'edit';
+  // 从后端重新获取完整数据
+  loading.value = true;
+  relativeApi.getById(row.id)
+    .then(data => {
+      dialogForm.value = {
+        id: data.id,
+        elderlyId: data.elderlyId || null,
+        name: data.name || '',
+        relationship: data.relationship || '',
+        phone: data.phone || '',
+        isActive: data.isActive !== false,
+      };
+      dialogVisible.value = true;
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('获取家属信息失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.elderlyId || !form.name || !form.phone) {
+    window.alert('老人、家属姓名和电话不能为空');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      await relativeApi.createRelative(form);
+      window.alert('添加成功');
+    } else {
+      await relativeApi.updateRelative(form.id, form);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
 }
 
 function onUnbind(row) {
-  const ok = window.confirm(`确定要解除${row.elderName}与${row.familyName}的绑定关系吗？`);
+  const ok = window.confirm(`确定要解除${row.elderName}与${row.familyName}的绑定关系吗?`);
   if (!ok) return;
-  window.alert('已解除绑定关系\n\n（演示版本，实际会调用后端API解除绑定）');
+  loading.value = true;
+  error.value = '';
+  relativeApi.deleteRelative(row.id)
+    .then(() => {
+      window.alert('已解除绑定关系');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('解除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 onMounted(load);
@@ -161,6 +253,48 @@ onMounted(load);
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新增/编辑对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click.self="closeDialog">
+      <div class="admin-dialog">
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '添加家属绑定' : '编辑家属信息' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>选择老人 <span style="color: red">*</span></label>
+            <select v-model="dialogForm.elderlyId" :disabled="dialogMode === 'edit'">
+              <option v-for="elder in elderOptions" :key="elder.id" :value="elder.id">
+                {{ elder.name }}
+              </option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>家属姓名 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.name" type="text" placeholder="请输入家属姓名" />
+          </div>
+          <div class="admin-form-group">
+            <label>关系</label>
+            <input v-model="dialogForm.relationship" type="text" placeholder="例：子女、配偶、兄弟姐妹" />
+          </div>
+          <div class="admin-form-group">
+            <label>联系电话 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.phone" type="text" placeholder="请输入联系电话" />
+          </div>
+          <div class="admin-form-group">
+            <label>
+              <input v-model="dialogForm.isActive" type="checkbox" />
+              已确认绑定
+            </label>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-dialog-btn cancel" @click="closeDialog">取消</button>
+          <button class="admin-dialog-btn confirm" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

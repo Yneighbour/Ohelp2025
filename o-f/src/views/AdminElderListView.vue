@@ -12,6 +12,21 @@ const healthFilter = ref('all');
 
 const rows = ref([]);
 
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  name: '',
+  age: null,
+  gender: '男',
+  phoneNumber: '',
+  contactPerson: '',
+  roomNumber: '',
+  medicalHistory: '',
+  healthStatus: 'normal',
+});
+
 function formatDate(value) {
   if (!value) return '';
   const s = String(value);
@@ -75,7 +90,19 @@ function onSearch() {
 }
 
 function onAdd() {
-  window.alert('添加老人档案\n\n（演示版本，实际会打开添加表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    name: '',
+    age: null,
+    gender: '男',
+    phoneNumber: '',
+    contactPerson: '',
+    roomNumber: '',
+    medicalHistory: '',
+    healthStatus: 'normal',
+  };
+  dialogVisible.value = true;
 }
 
 function onViewHealth(row) {
@@ -83,13 +110,81 @@ function onViewHealth(row) {
 }
 
 function onEdit(row) {
-  window.alert(`编辑${row.name} (ID: ${row.id})\n\n（演示版本，实际会打开编辑表单）`);
+  dialogMode.value = 'edit';
+  // 从后端重新获取完整数据
+  loading.value = true;
+  elderApi.getById(row.id)
+    .then(data => {
+      dialogForm.value = {
+        id: data.id,
+        name: data.name || '',
+        age: data.age || null,
+        gender: data.gender || '男',
+        phoneNumber: data.phoneNumber || '',
+        contactPerson: data.contactPerson || '',
+        roomNumber: data.roomNumber || '',
+        medicalHistory: data.medicalHistory || '',
+        healthStatus: data.healthStatus || 'normal',
+      };
+      dialogVisible.value = true;
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('获取老人信息失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.name || !form.phoneNumber) {
+    window.alert('姓名和联系电话不能为空');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      await elderApi.createElderly(form);
+      window.alert('添加成功');
+    } else {
+      await elderApi.updateElderly(form.id, form);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
 }
 
 function onDelete(row) {
-  const ok = window.confirm(`确定要删除“${row.name}”吗？\n\n此操作不可恢复！`);
+  const ok = window.confirm(`确定要删除"${row.name}"吗?\n\n此操作不可恢复！`);
   if (!ok) return;
-  window.alert(`已删除${row.name} (ID: ${row.id})\n\n（演示版本，实际会调用后端API删除）`);
+  loading.value = true;
+  error.value = '';
+  elderApi.deleteElderly(row.id)
+    .then(() => {
+      window.alert('删除成功');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('删除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 onMounted(load);
@@ -159,6 +254,61 @@ onMounted(load);
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新增/编辑对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click.self="closeDialog">
+      <div class="admin-dialog">
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '添加老人档案' : '编辑老人档案' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>姓名 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.name" type="text" placeholder="请输入姓名" />
+          </div>
+          <div class="admin-form-group">
+            <label>年龄</label>
+            <input v-model.number="dialogForm.age" type="number" min="0" max="150" placeholder="请输入年龄" />
+          </div>
+          <div class="admin-form-group">
+            <label>性别</label>
+            <select v-model="dialogForm.gender">
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>联系电话 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.phoneNumber" type="text" placeholder="请输入联系电话" />
+          </div>
+          <div class="admin-form-group">
+            <label>紧急联系人</label>
+            <input v-model="dialogForm.contactPerson" type="text" placeholder="请输入紧急联系人" />
+          </div>
+          <div class="admin-form-group">
+            <label>房间号</label>
+            <input v-model="dialogForm.roomNumber" type="text" placeholder="请输入房间号" />
+          </div>
+          <div class="admin-form-group">
+            <label>病史</label>
+            <textarea v-model="dialogForm.medicalHistory" rows="3" placeholder="请输入病史信息"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label>健康状态</label>
+            <select v-model="dialogForm.healthStatus">
+              <option value="normal">健康</option>
+              <option value="warning">亚健康</option>
+              <option value="danger">需关注</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-dialog-btn cancel" @click="closeDialog">取消</button>
+          <button class="admin-dialog-btn confirm" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

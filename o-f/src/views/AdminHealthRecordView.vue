@@ -13,6 +13,23 @@ const statusFilter = ref('all');
 
 const rows = ref([]);
 
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  elderlyId: null,
+  recordDate: '',
+  bloodPressure: '',
+  heartRate: null,
+  temperature: null,
+  weight: null,
+  glucoseLevel: null,
+  notes: '',
+  doctorId: null,
+  isActive: true,
+});
+
 function formatDate(value) {
   if (!value) return '';
   const s = String(value);
@@ -84,28 +101,108 @@ async function load() {
 }
 
 function onSearch() {
-  if (!keyword.value.trim()) {
-    window.alert('请输入搜索关键词');
-    return;
-  }
+  // 搜索功能已通过computed filteredRows实现，这里保留空函数
 }
 
 function onAdd() {
-  window.alert('添加健康记录\n\n（演示版本，实际会打开添加表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    elderlyId: null,
+    recordDate: new Date().toISOString().slice(0, 10),
+    bloodPressure: '',
+    heartRate: null,
+    temperature: null,
+    weight: null,
+    glucoseLevel: null,
+    notes: '',
+    doctorId: null,
+    isActive: true,
+  };
+  dialogVisible.value = true;
 }
 
 function onView(row) {
-  window.alert(`查看${row.elderName}的${row.recordType}记录详情 (ID: ${row.id})\n\n（演示版本，实际会打开详情页面）`);
+  window.alert(`查看${row.elderName}的${row.recordType}记录详情 (ID: ${row.id})\n\n（详情页面待开发）`);
 }
 
 function onEdit(row) {
-  window.alert(`编辑${row.elderName}的记录 (ID: ${row.id})\n\n（演示版本，实际会打开编辑表单）`);
+  dialogMode.value = 'edit';
+  loading.value = true;
+  healthApi.getHealthRecordById(row.id)
+    .then(data => {
+      dialogForm.value = {
+        id: data.id,
+        elderlyId: data.elderlyId || null,
+        recordDate: data.recordDate || new Date().toISOString().slice(0, 10),
+        bloodPressure: data.bloodPressure || '',
+        heartRate: data.heartRate || null,
+        temperature: data.temperature || null,
+        weight: data.weight || null,
+        glucoseLevel: data.glucoseLevel || null,
+        notes: data.notes || '',
+        doctorId: data.doctorId || null,
+        isActive: data.isActive !== false,
+      };
+      dialogVisible.value = true;
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('获取健康记录信息失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onDelete(row) {
   const ok = window.confirm('确定要删除该记录吗？\n\n此操作不可恢复！');
   if (!ok) return;
-  window.alert(`已删除记录 (ID: ${row.id})\n\n（演示版本，实际会调用后端API删除）`);
+  loading.value = true;
+  error.value = '';
+  healthApi.deleteHealthRecord(row.id)
+    .then(() => {
+      window.alert('删除成功');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('删除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.elderlyId) {
+    window.alert('请输入老人ID');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      await healthApi.createHealthRecord(form);
+      window.alert('添加成功');
+    } else {
+      await healthApi.updateHealthRecord(form.id, form);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(load);
@@ -180,6 +277,64 @@ onMounted(load);
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新增/编辑对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click.self="closeDialog">
+      <div class="admin-dialog">
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '添加健康记录' : '编辑健康记录' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>老人ID <span style="color: red">*</span></label>
+            <input v-model.number="dialogForm.elderlyId" type="number" placeholder="请输入老人ID" />
+          </div>
+          <div class="admin-form-group">
+            <label>记录日期 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.recordDate" type="date" />
+          </div>
+          <div class="admin-form-group">
+            <label>血压 (mmHg)</label>
+            <input v-model="dialogForm.bloodPressure" type="text" placeholder="例如：120/80" />
+          </div>
+          <div class="admin-form-group">
+            <label>心率 (bpm)</label>
+            <input v-model.number="dialogForm.heartRate" type="number" placeholder="请输入心率" />
+          </div>
+          <div class="admin-form-group">
+            <label>体温 (℃)</label>
+            <input v-model.number="dialogForm.temperature" type="number" step="0.1" placeholder="请输入体温" />
+          </div>
+          <div class="admin-form-group">
+            <label>体重 (kg)</label>
+            <input v-model.number="dialogForm.weight" type="number" step="0.1" placeholder="请输入体重" />
+          </div>
+          <div class="admin-form-group">
+            <label>血糖 (mmol/L)</label>
+            <input v-model.number="dialogForm.glucoseLevel" type="number" step="0.1" placeholder="请输入血糖值" />
+          </div>
+          <div class="admin-form-group">
+            <label>备注</label>
+            <textarea v-model="dialogForm.notes" rows="3" placeholder="请输入备注信息"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label>医生ID</label>
+            <input v-model.number="dialogForm.doctorId" type="number" placeholder="请输入医生ID（可选）" />
+          </div>
+          <div class="admin-form-group">
+            <label>
+              <input v-model="dialogForm.isActive" type="checkbox" />
+              启用状态
+            </label>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-dialog-btn cancel" @click="closeDialog">取消</button>
+          <button class="admin-dialog-btn confirm" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

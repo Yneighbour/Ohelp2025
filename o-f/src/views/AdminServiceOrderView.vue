@@ -12,6 +12,23 @@ const statusFilter = ref('all');
 
 const rows = ref([]);
 
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  elderlyId: null,
+  serviceType: '',
+  serviceProviderId: null,
+  startDate: '',
+  endDate: '',
+  frequency: '',
+  price: null,
+  description: '',
+  status: 'pending',
+  isActive: true,
+});
+
 function formatDateTime(value) {
   if (!value) return '';
   const s = String(value);
@@ -70,20 +87,45 @@ async function load() {
 }
 
 function onSearch() {
-  if (!keyword.value.trim()) {
-    window.alert('请输入搜索关键词');
-    return;
-  }
+  // 搜索功能已通过computed filteredRows实现，这里保留空函数
 }
 
 function onAdd() {
-  window.alert('新建预约\n\n（演示版本，实际会打开新建预约表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    elderlyId: null,
+    serviceType: '',
+    serviceProviderId: null,
+    startDate: new Date().toISOString().slice(0, 16),
+    endDate: '',
+    frequency: '',
+    price: null,
+    description: '',
+    status: 'pending',
+    isActive: true,
+  };
+  dialogVisible.value = true;
 }
 
 function onConfirm(row) {
-  const ok = window.confirm(`确定要确认预约单“${row.orderNo}”吗？`);
+  const ok = window.confirm(`确定要确认预约单"${row.orderNo}"吗？`);
   if (!ok) return;
-  window.alert(`已确认预约单：${row.orderNo}\n\n（当前版本暂未对接后端确认接口）`);
+  
+  loading.value = true;
+  error.value = '';
+  serviceOrderApi.confirm(row.id)
+    .then(() => {
+      window.alert(`已确认预约单：${row.orderNo}`);
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('确认失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onCancel(row) {
@@ -127,7 +169,87 @@ function onComplete(row) {
 }
 
 function onDetail(row) {
-  window.alert(`查看预约单${row.orderNo}详情 (ID: ${row.id})\n\n（演示版本，实际会打开详情页面）`);
+  window.alert(`查看预约单${row.orderNo}详情 (ID: ${row.id})\n\n（详情页面待开发）`);
+}
+
+function onEdit(row) {
+  dialogMode.value = 'edit';
+  loading.value = true;
+  serviceOrderApi.getById(row.id)
+    .then(data => {
+      dialogForm.value = {
+        id: data.id,
+        elderlyId: data.elderlyId || null,
+        serviceType: data.serviceType || '',
+        serviceProviderId: data.serviceProviderId || null,
+        startDate: data.startDate || '',
+        endDate: data.endDate || '',
+        frequency: data.frequency || '',
+        price: data.price || null,
+        description: data.description || '',
+        status: data.status || 'pending',
+        isActive: data.isActive !== false,
+      };
+      dialogVisible.value = true;
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('获取预约单信息失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function onDelete(row) {
+  const ok = window.confirm(`确定要删除预约单"${row.orderNo}"吗？\n\n此操作不可恢复！`);
+  if (!ok) return;
+  
+  loading.value = true;
+  error.value = '';
+  serviceOrderApi.deleteServiceOrder(row.id)
+    .then(() => {
+      window.alert('删除成功');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('删除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.elderlyId || !form.serviceType) {
+    window.alert('老人ID和服务类型为必填项');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      await serviceOrderApi.createServiceOrder(form);
+      window.alert('添加成功');
+    } else {
+      await serviceOrderApi.updateServiceOrder(form.id, form);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(load);
@@ -182,13 +304,16 @@ onMounted(load);
               <div class="admin-actions">
                 <template v-if="o.status === 'pending'">
                   <button class="admin-action-btn view" type="button" @click="onConfirm(o)">确认</button>
+                  <button class="admin-action-btn edit" type="button" @click="onEdit(o)">编辑</button>
                   <button class="admin-action-btn delete" type="button" @click="onCancel(o)">取消</button>
                 </template>
                 <template v-else-if="o.status === 'confirmed'">
                   <button class="admin-action-btn view" type="button" @click="onComplete(o)">完成</button>
+                  <button class="admin-action-btn edit" type="button" @click="onEdit(o)">编辑</button>
                   <button class="admin-action-btn delete" type="button" @click="onCancel(o)">取消</button>
                 </template>
-                <button class="admin-action-btn edit" type="button" @click="onDetail(o)">详情</button>
+                <button class="admin-action-btn view" type="button" @click="onDetail(o)">详情</button>
+                <button class="admin-action-btn delete" type="button" @click="onDelete(o)">删除</button>
               </div>
             </td>
           </tr>
@@ -202,6 +327,74 @@ onMounted(load);
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新建/编辑预约对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click="closeDialog">
+      <div class="admin-dialog" @click.stop>
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '新建预约' : '编辑预约' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>老人ID <span style="color: red">*</span></label>
+            <input v-model.number="dialogForm.elderlyId" type="number" placeholder="请输入老人ID" />
+          </div>
+          <div class="admin-form-group">
+            <label>服务类型 <span style="color: red">*</span></label>
+            <select v-model="dialogForm.serviceType">
+              <option value="">请选择</option>
+              <option value="medical">医疗护理</option>
+              <option value="daily">日常照料</option>
+              <option value="rehabilitation">康复训练</option>
+              <option value="psychological">心理疏导</option>
+              <option value="nutrition">营养配餐</option>
+              <option value="other">其他</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>服务人员ID</label>
+            <input v-model.number="dialogForm.serviceProviderId" type="number" placeholder="请输入服务人员ID（可选）" />
+          </div>
+          <div class="admin-form-group">
+            <label>开始时间</label>
+            <input v-model="dialogForm.startDate" type="datetime-local" />
+          </div>
+          <div class="admin-form-group">
+            <label>结束时间</label>
+            <input v-model="dialogForm.endDate" type="datetime-local" />
+          </div>
+          <div class="admin-form-group">
+            <label>服务频次</label>
+            <select v-model="dialogForm.frequency">
+              <option value="">请选择</option>
+              <option value="once">一次性</option>
+              <option value="daily">每天</option>
+              <option value="weekly">每周</option>
+              <option value="monthly">每月</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>价格（元）</label>
+            <input v-model.number="dialogForm.price" type="number" step="0.01" placeholder="请输入价格" />
+          </div>
+          <div class="admin-form-group">
+            <label>备注说明</label>
+            <textarea v-model="dialogForm.description" rows="3" placeholder="请输入备注说明"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label>
+              <input v-model="dialogForm.isActive" type="checkbox" />
+              启用
+            </label>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-btn-secondary" @click="closeDialog">取消</button>
+          <button class="admin-btn-primary" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

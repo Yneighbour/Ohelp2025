@@ -264,5 +264,78 @@ ALTER TABLE worker ADD INDEX idx_is_available (is_available);
 ALTER TABLE file_record ADD INDEX idx_created_at (created_at);
 
 -- ==============================================================
+-- 8. Role 角色管理模块表
+-- ==============================================================
+
+CREATE TABLE IF NOT EXISTS role (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '角色ID',
+  name VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
+  code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码',
+  description VARCHAR(500) COMMENT '角色描述',
+  is_active TINYINT(1) DEFAULT 1 COMMENT '是否激活',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX idx_code (code),
+  INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
+
+-- ==============================================================
+-- 9. Permission 权限管理模块表
+-- ==============================================================
+
+CREATE TABLE IF NOT EXISTS permission (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '权限ID',
+  name VARCHAR(100) NOT NULL UNIQUE COMMENT '权限名称',
+  code VARCHAR(100) NOT NULL UNIQUE COMMENT '权限编码',
+  module VARCHAR(50) COMMENT '所属模块',
+  description VARCHAR(500) COMMENT '权限描述',
+  is_active TINYINT(1) DEFAULT 1 COMMENT '是否激活',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX idx_code (code),
+  INDEX idx_module (module),
+  INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='权限表';
+
+-- ==============================================================
+-- 10. RolePermission 角色权限关联表
+-- ==============================================================
+
+CREATE TABLE IF NOT EXISTS role_permission (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '关联ID',
+  role_id BIGINT NOT NULL COMMENT '角色ID',
+  permission_id BIGINT NOT NULL COMMENT '权限ID',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE,
+  FOREIGN KEY (permission_id) REFERENCES permission(id) ON DELETE CASCADE,
+  UNIQUE KEY uk_role_permission (role_id, permission_id),
+  INDEX idx_role_id (role_id),
+  INDEX idx_permission_id (permission_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色权限关联表';
+
+-- ==============================================================
+-- 11. Enrollment 活动报名表
+-- ==============================================================
+
+CREATE TABLE IF NOT EXISTS enrollment (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '报名ID',
+  activity_id BIGINT NOT NULL COMMENT '活动ID',
+  elderly_id BIGINT NOT NULL COMMENT '老人ID',
+  status VARCHAR(50) DEFAULT 'pending' COMMENT '报名状态: pending(待确认), confirmed(已确认), attended(已签到), absent(未参加), cancelled(已取消)',
+  enroll_time DATETIME COMMENT '报名时间',
+  check_in_time DATETIME COMMENT '签到时间',
+  notes TEXT COMMENT '备注说明',
+  is_active TINYINT(1) DEFAULT 1 COMMENT '是否激活',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE,
+  FOREIGN KEY (elderly_id) REFERENCES elderly(id) ON DELETE CASCADE,
+  INDEX idx_activity_id (activity_id),
+  INDEX idx_elderly_id (elderly_id),
+  INDEX idx_status (status),
+  UNIQUE KEY uk_activity_elderly (activity_id, elderly_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='活动报名表';
+
+-- ==============================================================
 -- 脚本执行完毕
 -- ==============================================================

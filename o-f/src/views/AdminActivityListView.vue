@@ -13,6 +13,22 @@ const statusFilter = ref('all');
 
 const rows = ref([]);
 
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  name: '',
+  category: 'health',
+  location: '',
+  startTime: '',
+  endTime: '',
+  capacity: 50,
+  description: '',
+  requirements: '',
+  status: 'pending',
+});
+
 function formatDateTime(value) {
   if (!value) return '';
   const s = String(value);
@@ -88,7 +104,20 @@ function onSearch() {
 }
 
 function onAdd() {
-  window.alert('添加活动\n\n（演示版本，实际会打开添加表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    name: '',
+    category: 'health',
+    location: '',
+    startTime: '',
+    endTime: '',
+    capacity: 50,
+    description: '',
+    requirements: '',
+    status: 'pending',
+  };
+  dialogVisible.value = true;
 }
 
 function onViewEnrollments(row) {
@@ -96,7 +125,101 @@ function onViewEnrollments(row) {
 }
 
 function onEdit(row) {
-  window.alert(`编辑${row.name} (ID: ${row.id})\n\n（演示版本，实际会打开编辑表单）`);
+  dialogMode.value = 'edit';
+  // 从后端重新获取完整数据
+  loading.value = true;
+  activityApi.getById(row.id)
+    .then(data => {
+      dialogForm.value = {
+        id: data.id,
+        name: data.name || '',
+        category: data.category || 'health',
+        location: data.location || '',
+        startTime: data.startTime || '',
+        endTime: data.endTime || '',
+        capacity: data.capacity || 50,
+        description: data.description || '',
+        requirements: data.requirements || '',
+        status: data.status || 'pending',
+      };
+      dialogVisible.value = true;
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('获取活动详情失败');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.name || !form.location || !form.startTime) {
+    window.alert('活动名称、地点和开始时间不能为空');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      await activityApi.createActivity(form);
+      window.alert('添加成功');
+    } else {
+      await activityApi.updateActivity(form.id, form);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function onDelete(row) {
+  const ok = window.confirm(`确定要删除活动"${row.name}"吗?\n\n此操作不可恢复！`);
+  if (!ok) return;
+  loading.value = true;
+  error.value = '';
+  activityApi.deleteActivity(row.id)
+    .then(() => {
+      window.alert('删除成功');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('删除失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+function onReactivate(row) {
+  const ok = window.confirm(`确定要重新上架活动"${row.name}"吗?`);
+  if (!ok) return;
+  loading.value = true;
+  error.value = '';
+  activityApi.activateActivity(row.id)
+    .then(() => {
+      window.alert('已重新上架');
+      return load();
+    })
+    .catch(e => {
+      console.error(e);
+      window.alert('操作失败，请稍后重试');
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function onCancel(row) {
@@ -178,7 +301,9 @@ onMounted(load);
               <div class="admin-actions">
                 <button class="admin-action-btn view" type="button" @click="onViewEnrollments(a)">报名列表</button>
                 <button class="admin-action-btn edit" type="button" @click="onEdit(a)">编辑</button>
-                <button v-if="a.status === 'pending'" class="admin-action-btn delete" type="button" @click="onCancel(a)">取消</button>
+                <button v-if="a.status !== 'cancelled'" class="admin-action-btn delete" type="button" @click="onCancel(a)">取消</button>
+                <button v-if="a.status === 'cancelled'" class="admin-action-btn toggle" type="button" @click="onReactivate(a)">重新上架</button>
+                <button class="admin-action-btn delete" type="button" @click="onDelete(a)">删除</button>
               </div>
             </td>
           </tr>
@@ -192,6 +317,68 @@ onMounted(load);
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新增/编辑对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click.self="closeDialog">
+      <div class="admin-dialog">
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '添加活动' : '编辑活动' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>活动名称 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.name" type="text" placeholder="请输入活动名称" />
+          </div>
+          <div class="admin-form-group">
+            <label>活动类型</label>
+            <select v-model="dialogForm.category">
+              <option value="health">健康</option>
+              <option value="culture">文娱</option>
+              <option value="learning">学习</option>
+              <option value="travel">旅游</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>活动地点 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.location" type="text" placeholder="请输入活动地点" />
+          </div>
+          <div class="admin-form-group">
+            <label>开始时间 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.startTime" type="datetime-local" />
+          </div>
+          <div class="admin-form-group">
+            <label>结束时间</label>
+            <input v-model="dialogForm.endTime" type="datetime-local" />
+          </div>
+          <div class="admin-form-group">
+            <label>活动容量</label>
+            <input v-model.number="dialogForm.capacity" type="number" min="1" placeholder="请输入活动容量" />
+          </div>
+          <div class="admin-form-group">
+            <label>活动介绍</label>
+            <textarea v-model="dialogForm.description" rows="3" placeholder="请输入活动介绍"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label>参与要求</label>
+            <textarea v-model="dialogForm.requirements" rows="2" placeholder="请输入参与要求"></textarea>
+          </div>
+          <div class="admin-form-group">
+            <label>状态</label>
+            <select v-model="dialogForm.status">
+              <option value="pending">未开始</option>
+              <option value="ongoing">进行中</option>
+              <option value="ended">已结束</option>
+              <option value="cancelled">已取消</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-dialog-btn cancel" @click="closeDialog">取消</button>
+          <button class="admin-dialog-btn confirm" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

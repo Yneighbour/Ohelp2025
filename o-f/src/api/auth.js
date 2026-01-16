@@ -10,7 +10,18 @@ export async function login({ username, password }) {
     timeout: 5000,
   });
 
-  if (envelope?.data?.token) return envelope.data;
+  if (envelope?.data?.token) {
+    const loginData = envelope.data;
+    return {
+      token: loginData.token,
+      userId: loginData.userId,
+      username: loginData.username,
+      // 新增字段（后端需要支持）
+      userType: loginData.userType || null,       // 'elder', 'family', 'admin', 'operator'
+      elderlyId: loginData.elderlyId || null,     // elder/family 才有值
+      relativeId: loginData.relativeId || null,   // family 才有值
+    };
+  }
 
   const message = envelope?.message || '登录失败';
   throw new Error(message);
@@ -26,3 +37,16 @@ export async function validateToken(token) {
   });
   return Boolean(data?.valid);
 }
+
+export async function logout() {
+  try {
+    await requestData({
+      method: 'POST',
+      url: '/auth/logout',
+    });
+  } catch (error) {
+    // 即使登出请求失败，也要清除本地身份信息
+    console.warn('Logout API failed:', error);
+  }
+}
+

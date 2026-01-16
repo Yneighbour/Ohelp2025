@@ -13,6 +13,19 @@ const roleFilter = ref('all');
 
 const rows = ref([]);
 
+// 新增/编辑对话框状态
+const dialogVisible = ref(false);
+const dialogMode = ref('add'); // 'add' | 'edit'
+const dialogForm = ref({
+  id: null,
+  username: '',
+  phone: '',
+  email: '',
+  password: '',
+  role: 'user',
+  isActive: true,
+});
+
 function formatDate(value) {
   if (!value) return '';
   const s = String(value);
@@ -78,11 +91,70 @@ function onSearch() {
 }
 
 function onAdd() {
-  window.alert('添加用户\n\n（演示版本，实际会打开添加表单）');
+  dialogMode.value = 'add';
+  dialogForm.value = {
+    id: null,
+    username: '',
+    phone: '',
+    email: '',
+    password: '',
+    role: 'user',
+    isActive: true,
+  };
+  dialogVisible.value = true;
 }
 
 function onEdit(row) {
-  window.alert(`编辑${row.username} (ID: ${row.id})\n\n（演示版本，实际会打开编辑表单）`);
+  dialogMode.value = 'edit';
+  dialogForm.value = {
+    id: row.id,
+    username: row.username,
+    phone: row.phone,
+    email: row.email || '',
+    password: '',
+    role: row.role || 'user',
+    isActive: row.status === 'active',
+  };
+  dialogVisible.value = true;
+}
+
+function closeDialog() {
+  dialogVisible.value = false;
+}
+
+async function saveDialog() {
+  const form = dialogForm.value;
+  if (!form.username || !form.phone) {
+    window.alert('用户名和手机号不能为空');
+    return;
+  }
+
+  loading.value = true;
+  error.value = '';
+  try {
+    if (dialogMode.value === 'add') {
+      if (!form.password) {
+        window.alert('密码不能为空');
+        return;
+      }
+      await usersApi.createUser(form);
+      window.alert('添加成功');
+    } else {
+      const payload = { ...form };
+      if (!payload.password) {
+        delete payload.password; // 不修改密码时删除该字段
+      }
+      await usersApi.updateUser(form.id, payload);
+      window.alert('更新成功');
+    }
+    dialogVisible.value = false;
+    await load();
+  } catch (e) {
+    console.error(e);
+    window.alert(`保存失败: ${e.message || '请稍后重试'}`);
+  } finally {
+    loading.value = false;
+  }
 }
 
 function onToggle(row) {
@@ -197,6 +269,52 @@ onMounted(load);
     <div class="admin-pagination">
       <span>共 {{ filteredRows.length }} 条记录</span>
       <span>第 1/1 页</span>
+    </div>
+
+    <!-- 新增/编辑对话框 -->
+    <div v-if="dialogVisible" class="admin-dialog-overlay" @click.self="closeDialog">
+      <div class="admin-dialog">
+        <div class="admin-dialog-header">
+          <h3>{{ dialogMode === 'add' ? '添加用户' : '编辑用户' }}</h3>
+          <button class="admin-dialog-close" @click="closeDialog">×</button>
+        </div>
+        <div class="admin-dialog-body">
+          <div class="admin-form-group">
+            <label>用户名 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.username" type="text" placeholder="请输入用户名" />
+          </div>
+          <div class="admin-form-group">
+            <label>手机号 <span style="color: red">*</span></label>
+            <input v-model="dialogForm.phone" type="text" placeholder="请输入手机号" />
+          </div>
+          <div class="admin-form-group">
+            <label>邮箱</label>
+            <input v-model="dialogForm.email" type="email" placeholder="请输入邮箱" />
+          </div>
+          <div class="admin-form-group">
+            <label>密码 {{ dialogMode === 'edit' ? '(留空则不修改)' : '' }} <span v-if="dialogMode === 'add'" style="color: red">*</span></label>
+            <input v-model="dialogForm.password" type="password" placeholder="请输入密码" />
+          </div>
+          <div class="admin-form-group">
+            <label>角色</label>
+            <select v-model="dialogForm.role">
+              <option value="user">普通用户</option>
+              <option value="operator">操作员</option>
+              <option value="admin">管理员</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>
+              <input v-model="dialogForm.isActive" type="checkbox" />
+              启用状态
+            </label>
+          </div>
+        </div>
+        <div class="admin-dialog-footer">
+          <button class="admin-dialog-btn cancel" @click="closeDialog">取消</button>
+          <button class="admin-dialog-btn confirm" @click="saveDialog">{{ dialogMode === 'add' ? '确认添加' : '确认修改' }}</button>
+        </div>
+      </div>
     </div>
   </AdminLayout>
 </template>

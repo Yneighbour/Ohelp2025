@@ -38,12 +38,40 @@
 - 老人档案管理：老人列表、健康状态标识（读接口已接入）
 - 家属绑定管理：老人-家属关联视图（读接口已接入）
 - 健康记录管理：全量健康记录查看（读接口已接入）
-- 服务项目管理：服务项目列表（当前为演示数据）
-- 服务预约管理：服务订单列表，支持取消/完成操作（已接入后端接口）
-- 活动管理：活动列表查看，支持取消活动（对应活动下架接口）；新增/编辑暂为演示
-- 报名管理：活动报名管理原型页（当前为演示数据）
+- 服务项目管理：服务项目列表（已完整对接后端CRUD）
+- 服务预约管理：服务订单列表，支持取消/完成操作（已完整对接后端CRUD）
+- 活动管理：活动列表查看，支持新增/编辑/删除（已完整对接后端CRUD）
+- **报名管理**：活动报名列表，支持新增/编辑/删除、确认/签到/取消等状态操作（已完整对接后端CRUD）
 
-> 前后端每个模块的“已对接/部分对接/仅演示”的详细梳理，见 `o-f/前后端交互对接说明.md`。
+> 前后端每个模块的"已对接/部分对接/仅演示"的详细梳理，见 `o-f/前后端交互对接说明.md`。
+
+## 数据库初始化
+
+### 快速开始
+
+**如果是第一次设置：**
+
+```powershell
+# Windows PowerShell
+mysql -u root -p ohelp < "o-b\database_schema.sql"
+mysql -u root -p ohelp < "o-b\database_init_data.sql"
+```
+
+**Linux/Mac：**
+```bash
+mysql -u root -p ohelp < o-b/database_schema.sql
+mysql -u root -p ohelp < o-b/database_init_data.sql
+```
+
+### 快速恢复报名数据
+
+如果报名管理界面为空，可直接执行报名数据恢复脚本：
+
+```powershell
+mysql -u root -p ohelp < "o-b\QUICK_ENROLLMENT_DATA.sql"
+```
+
+详见 [数据初始化快速指南](ENROLLMENT_DATA_QUICK_FIX.md)。
 
 ## 启动说明
 
@@ -86,6 +114,17 @@ mysql -u root -p ohelp < "o-b\database_init_data.sql"
 ## 初始化数据
 
 数据库已预置了各种角色的用户，管理员账号密码均为admin。
+
+### 包含的示例数据
+- ✓ 4个用户账户
+- ✓ 4个老人信息
+- ✓ 3个活动
+- ✓ 12个活动报名记录（覆盖5种状态）
+- ✓ 健康记录、紧急求助、服务订单等
+
+**首次初始化需要执行两个脚本：**
+1. `database_schema.sql` - 创建表结构
+2. `database_init_data.sql` - 初始化数据
 
 ## 前后端联调约定（重要）
 
