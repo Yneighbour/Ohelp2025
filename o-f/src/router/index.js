@@ -25,7 +25,6 @@ import AdminServiceListView from '../views/AdminServiceListView.vue';
 import AdminServiceOrderView from '../views/AdminServiceOrderView.vue';
 import AdminActivityListView from '../views/AdminActivityListView.vue';
 import AdminEnrollmentView from '../views/AdminEnrollmentView.vue';
-import PlaceholderView from '../views/PlaceholderView.vue';
 import { validateExistingToken } from '../services/session';
 
 const router = createRouter({
